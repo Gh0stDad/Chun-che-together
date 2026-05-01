@@ -1,0 +1,21 @@
+{
+  "name": "Us Tracker",
+  "short_name": "Us ♡",
+  "description": "Our custom daily tracker and quest log.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d0c0f",
+  "theme_color": "#1e1b23",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
