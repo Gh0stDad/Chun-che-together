@@ -145,6 +145,9 @@ section.active { display:block; }
 
 .toast { position:fixed; bottom:calc(var(--nav-h) + 14px); left:50%; transform:translateX(-50%) translateY(12px); background:var(--card); border:1px solid var(--border2); border-radius:20px; padding:9px 20px; font-size:0.8rem; opacity:0; transition:all 0.28s; z-index:999; pointer-events:none; }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+.view-sel { background:none; border:none; color:var(--muted); font-size:0.7rem; font-family:var(--font-b); text-transform:uppercase; letter-spacing:1px; outline:none; text-align:center; padding: 2px; }
+.view-sel option { background:var(--card); color:var(--text); }
 </style>
 </head>
 <body>
@@ -187,8 +190,25 @@ section.active { display:block; }
 </section>
 
 <section id="sec-schedule">
-  <div class="sec-head"><div class="sec-title">Calendar & Cycle</div><button class="sec-add" onclick="openModal('eventModal')">+ Add Event</button></div>
-  <div class="cal-nav"><button onclick="calPrev()">← Prev</button><div class="cal-month" id="calMonth"></div><button onclick="calNext()">Next →</button></div>
+  <div class="sec-head">
+    <div class="sec-title">Calendar & Cycle</div>
+    <div>
+      <button class="sec-add" onclick="openCycleModal()" style="margin-right:4px;">⚙️ Cycle</button>
+      <button class="sec-add" onclick="openModal('eventModal')">+ Add</button>
+    </div>
+  </div>
+  <div class="cal-nav">
+    <button onclick="calPrev()">← Prev</button>
+    <div style="text-align:center;">
+      <div class="cal-month" id="calMonth"></div>
+      <select class="view-sel" id="viewModeSel" onchange="viewMode=this.value; renderCalendar(); renderEventList();">
+        <option value="month">Month</option>
+        <option value="week">Week</option>
+        <option value="day">Day</option>
+      </select>
+    </div>
+    <button onclick="calNext()">Next →</button>
+  </div>
   <div class="cal-grid" id="calGrid"></div>
   <div id="eventList"></div>
 </section>
@@ -206,6 +226,22 @@ section.active { display:block; }
   <button onclick="showSec('schedule',this)"><span class="ni">📅</span>Dates</button>
   <button onclick="showSec('rewards',this)"><span class="ni">🏆</span>Shop</button>
 </nav>
+
+<div class="overlay" id="cycleModal">
+  <div class="modal">
+    <div class="modal-title">Cycle Settings</div>
+    <label>First Day of Last Period</label>
+    <input type="date" id="cy-start">
+    <div class="row2">
+      <div><label>Avg Cycle Length</label><input type="number" id="cy-len" value="28" min="20" max="45"></div>
+      <div><label>Avg Period Length</label><input type="number" id="cy-plen" value="5" min="2" max="10"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('cycleModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCycle()">Save Settings</button>
+    </div>
+  </div>
+</div>
 
 <div class="overlay" id="habitModal">
   <div class="modal">
@@ -314,7 +350,7 @@ const DEFAULT = {
 };
 
 let S = deepClone(DEFAULT);
-const saved = localStorage.getItem('ct4'); 
+const saved = localStorage.getItem('ct5'); 
 if(saved){ try{ S = {...S, ...JSON.parse(saved)}; }catch(e){} }
 
 const activeTimers = {};
@@ -322,12 +358,13 @@ const now = new Date();
 const todayISO = now.toISOString().slice(0,10);
 let selDate = todayISO;
 let tempSubtasks = [];
+let viewMode = 'month'; // View Toggle State
 
 document.getElementById('hdate').textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
 document.getElementById('em-date').value = todayISO;
 
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
-function save(){ localStorage.setItem('ct4', JSON.stringify(S)); }
+function save(){ localStorage.setItem('ct5', JSON.stringify(S)); }
 function n1(){ return document.getElementById('name1').value||'Rebecca'; }
 function n2(){ return document.getElementById('name2').value||'Marius'; }
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2400); }
@@ -361,10 +398,7 @@ function addHabit(){
     subtasks: [...tempSubtasks]
   });
   
-  // Cross-Tab functionality
-  if(date) {
-    S.events.push({ id: Date.now()+1, title: `Quest: ${name}`, date: date, time: time || '12:00', who: document.getElementById('hm-who').value, color: '#d4a96a' });
-  }
+  if(date) S.events.push({ id: Date.now()+1, title: `Quest: ${name}`, date: date, time: time || '12:00', who: document.getElementById('hm-who').value, color: '#d4a96a' });
 
   document.getElementById('hm-name').value=''; document.getElementById('hm-date').value=''; document.getElementById('hm-time').value='';
   save(); closeModal('habitModal'); renderAll(); toast('Quest Added 🎯');
@@ -385,6 +419,20 @@ function addReward(){
   if(!name) return;
   S.rewards.push({ id: Date.now(), name, icon: document.getElementById('rm-icon').value||'🎁', type: document.getElementById('rm-type').value, cost: parseInt(document.getElementById('rm-cost').value)||50, claimed: false });
   document.getElementById('rm-name').value=''; save(); closeModal('rewardModal'); renderRewards(); toast('Added to Shop 🛍️');
+}
+
+function openCycleModal() {
+  document.getElementById('cy-start').value = S.cycle.lastStart;
+  document.getElementById('cy-len').value = S.cycle.cycleLength;
+  document.getElementById('cy-plen').value = S.cycle.periodLength;
+  openModal('cycleModal');
+}
+
+function saveCycle() {
+  S.cycle.lastStart = document.getElementById('cy-start').value;
+  S.cycle.cycleLength = parseInt(document.getElementById('cy-len').value) || 28;
+  S.cycle.periodLength = parseInt(document.getElementById('cy-plen').value) || 5;
+  save(); closeModal('cycleModal'); renderCalendar(); renderEventList(); toast('Cycle Updated 🌸');
 }
 
 // ═══════════════════════════════════
@@ -488,31 +536,63 @@ function calNext(){ calMonth2++; if(calMonth2>11){calMonth2=0;calYear++;} render
 
 function renderCalendar(){
   const grid = document.getElementById('calGrid'); grid.innerHTML='';
-  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{ const el=document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el); });
   
-  const daysInMonth = new Date(calYear,calMonth2+1,0).getDate();
-  const startDow = new Date(calYear,calMonth2,1).getDay();
+  if (viewMode === 'month' || viewMode === 'week') {
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(7,1fr)';
+    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{ const el=document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el); });
+  } else {
+    grid.style.display = 'block';
+  }
+  
   document.getElementById('calMonth').textContent = `${['January','February','March','April','May','June','July','August','September','October','November','December'][calMonth2]} ${calYear}`;
 
   let cells = [];
-  for(let i=startDow-1;i>=0;i--) cells.push({d:new Date(calYear,calMonth2,0).getDate()-i,month:calMonth2-1,year:calYear,other:true});
-  for(let d=1;d<=daysInMonth;d++) cells.push({d,month:calMonth2,year:calYear,other:false});
-  while(cells.length%7!==0) cells.push({d:cells.length-daysInMonth-startDow+1,month:calMonth2+1,year:calYear,other:true});
+  const refDate = new Date(selDate + 'T12:00:00');
+  
+  if (viewMode === 'month') {
+    const daysInMonth = new Date(calYear,calMonth2+1,0).getDate();
+    const startDow = new Date(calYear,calMonth2,1).getDay();
+    for(let i=startDow-1;i>=0;i--) cells.push({d:new Date(calYear,calMonth2,0).getDate()-i,month:calMonth2-1,year:calYear,other:true});
+    for(let d=1;d<=daysInMonth;d++) cells.push({d,month:calMonth2,year:calYear,other:false});
+    while(cells.length%7!==0) cells.push({d:cells.length-daysInMonth-startDow+1,month:calMonth2+1,year:calYear,other:true});
+  } else if (viewMode === 'week') {
+    const startOfWeek = new Date(refDate);
+    startOfWeek.setDate(refDate.getDate() - refDate.getDay());
+    for(let i=0; i<7; i++) {
+       const d = new Date(startOfWeek);
+       d.setDate(startOfWeek.getDate() + i);
+       cells.push({d: d.getDate(), month: d.getMonth(), year: d.getFullYear(), other: false});
+    }
+  }
 
-  cells.forEach(c=>{
-    const dateStr = `${c.year}-${String(c.month+1).padStart(2,'0')}-${String(c.d).padStart(2,'0')}`;
-    const cycleData = getCyclePhase(dateStr);
-    const eventsOnDay = S.events.filter(e => e.date === dateStr);
+  if (viewMode === 'month' || viewMode === 'week') {
+    cells.forEach(c=>{
+      const dateStr = `${c.year}-${String(c.month+1).padStart(2,'0')}-${String(c.d).padStart(2,'0')}`;
+      const cycleData = getCyclePhase(dateStr);
+      const eventsOnDay = S.events.filter(e => e.date === dateStr);
+      
+      const cell = document.createElement('div');
+      cell.className='cal-cell'+(c.other?' other-month':'')+(dateStr===todayISO?' today':'')+(dateStr===selDate?' selected':'');
+      if(cycleData && cycleData.phase !== 'default') cell.style.backgroundColor = cycleData.color;
+      
+      cell.innerHTML=`${cycleData && cycleData.icon ? `<div style="position:absolute; top:2px; right:4px; font-size:0.55rem; opacity:0.8;">${cycleData.icon}</div>` : ''}<span class="cal-num">${c.d}</span><div class="cal-dots">${eventsOnDay.map(e=>`<div class="cal-dot" style="background:${e.color}"></div>`).join('')}</div>`;
+      
+      cell.addEventListener('click', () => { selDate = dateStr; if(viewMode === 'month') { calMonth2 = c.month; calYear = c.year; } renderCalendar(); renderEventList(); });
+      grid.appendChild(cell);
+    });
+  } else if (viewMode === 'day') {
+    const cd = getCyclePhase(selDate);
+    const cycleText = cd && cd.phase !== 'default' ? `<div style="padding:12px; border-radius:12px; background:${cd.color}; margin:10px 0; font-size:0.85rem; border: 1px solid var(--border);">${cd.icon} Currently in <span style="text-transform:capitalize; font-weight:600; color:var(--text);">${cd.phase} Phase</span></div>` : '';
     
-    const cell = document.createElement('div');
-    cell.className='cal-cell'+(c.other?' other-month':'')+(dateStr===todayISO?' today':'')+(dateStr===selDate?' selected':'');
-    if(cycleData && cycleData.phase !== 'default') cell.style.backgroundColor = cycleData.color;
-    
-    cell.innerHTML=`${cycleData && cycleData.icon ? `<div style="position:absolute; top:2px; right:4px; font-size:0.55rem; opacity:0.8;">${cycleData.icon}</div>` : ''}<span class="cal-num">${c.d}</span><div class="cal-dots">${eventsOnDay.map(e=>`<div class="cal-dot" style="background:${e.color}"></div>`).join('')}</div>`;
-    
-    cell.addEventListener('click', () => { selDate = dateStr; renderCalendar(); renderEventList(); });
-    grid.appendChild(cell);
-  });
+    grid.innerHTML = `
+      <div style="text-align:center; padding: 15px 0 5px;">
+        <div style="font-family:var(--font-d); font-size:1.8rem; color:var(--shared); line-height:1.2;">${refDate.toLocaleDateString('en-US',{weekday:'long'})}</div>
+        <div style="font-size:0.9rem; color:var(--muted);">${refDate.toLocaleDateString('en-US',{month:'long', day:'numeric'})}</div>
+        ${cycleText}
+      </div>
+    `;
+  }
 }
 
 function fmtTime(t){ if(!t) return ''; const [h,m]=t.split(':'); const hr=parseInt(h); return `${hr>12?hr-12:hr||12}:${m}${hr>=12?'pm':'am'}`; }
@@ -528,9 +608,9 @@ function makeEventEl(ev, compact){
 function renderEventList(){
   const el = document.getElementById('eventList'); el.innerHTML='';
   const selEvents = S.events.filter(e=>e.date===selDate).sort((a,b)=>a.time.localeCompare(b.time));
-  const selLabel = selDate===todayISO ? 'Today' : new Date(selDate).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  const selLabel = selDate===todayISO ? 'Today' : new Date(selDate+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
   el.innerHTML=`<div class="event-day-header">${selLabel}</div>`;
-  if(!selEvents.length) el.innerHTML+=`<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No events — tap + Event to add</div>`;
+  if(!selEvents.length) el.innerHTML+=`<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No events — tap + Add to schedule</div>`;
   else selEvents.forEach(ev=>el.appendChild(makeEventEl(ev)));
 
   const dash = document.getElementById('dashEvents'); dash.innerHTML='';
