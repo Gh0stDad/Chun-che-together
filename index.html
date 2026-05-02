@@ -31,7 +31,7 @@ section.active { display:block; }
 @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
 .sec-head { display:flex; align-items:center; justify-content:space-between; margin:18px 0 12px; }
 .sec-title { font-family:var(--font-d); font-size:1.15rem; color:var(--muted2); }
-.sec-add { background:none; border:1px solid var(--border2); color:var(--muted2); padding:5px 12px; border-radius:8px; font-family:var(--font-b); font-size:0.72rem; cursor:pointer; }
+.sec-add { background:none; border:1px solid var(--border2); color:var(--muted2); padding:5px 12px; border-radius:8px; font-family:var(--font-b); font-size:0.72rem; cursor:pointer; flex-shrink:0; }
 .sec-add:hover { border-color:var(--shared); color:var(--shared); }
 
 .work-strip { display:flex; gap:6px; margin-bottom:8px; overflow-x:auto; padding-bottom:8px; }
@@ -200,7 +200,7 @@ section.active { display:block; }
 <div class="app">
 
 <header>
-  <div style="position:absolute; top:12px; right:14px; font-size:0.6rem; color:var(--muted2); font-family:monospace; font-weight:600;">v20</div>
+  <div style="position:absolute; top:12px; right:14px; font-size:0.6rem; color:var(--muted2); font-family:monospace; font-weight:600;">v22</div>
   <div class="logo">us <span>🤎</span></div>
   <div class="hdate" id="hdate"></div>
   <div class="streak">🔥 <span id="streakN">0</span> day streak</div>
@@ -262,9 +262,10 @@ section.active { display:block; }
 </section>
 
 <section id="sec-schedule">
-  <div id="calHeaderControls" class="sec-head">
-    <div class="sec-title">Calendar & Cycle</div>
-    <div style="display:flex; gap:4px;">
+  <div id="calHeaderControls" class="sec-head" style="align-items:flex-start;">
+    <div class="sec-title" style="white-space:nowrap; margin-right:10px;">Calendar</div>
+    <div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end;">
+      <button class="sec-add" onclick="openOverrideModal()" style="color:var(--warning); border-color:var(--warning);">+ Override</button>
       <button class="sec-add" onclick="openModal('togetherModal')" style="color:var(--success); border-color:var(--success);">+ Together</button>
       <button class="sec-add" onclick="openHealthModal()" style="color:var(--p1); border-color:var(--p1);">+ Health</button>
       <button class="sec-add" onclick="openCycleModal()">⚙️</button>
@@ -300,23 +301,23 @@ section.active { display:block; }
   <div class="sec-head"><div class="sec-title">Daily Board</div><div style="font-size:0.6rem; color:var(--muted);">Resets at Midnight</div></div>
   <div class="board-container"><canvas id="whiteboard" width="450" height="350"></canvas></div>
   <div class="board-tools" id="boardToolbox">
-    <div class="pen-color sel" style="background:#0d0c0f" data-c="#0d0c0f"></div>
+    <div class="pen-color sel" style="background:#0d0c0f" data-c="#0d0c0f" title="Black"></div>
     <div class="pen-color" style="background:#0d0c0f" data-c="#0d0c0f"></div>
     <div class="pen-color" style="background:#ffffff; border-color:var(--border2);" data-c="#ffffff" title="White / Eraser"></div>
     <div class="pen-color" style="background:#ffffff; border-color:var(--border2);" data-c="#ffffff"></div>
+    <div class="pen-color" style="background:#b58b66" data-c="#b58b66" title="Light Brown"></div>
     <div class="pen-color" style="background:#b58b66" data-c="#b58b66"></div>
-    <div class="pen-color" style="background:#b58b66" data-c="#b58b66"></div>
+    <div class="pen-color" style="background:#e8a4b8" data-c="#e8a4b8" title="Pink"></div>
     <div class="pen-color" style="background:#e8a4b8" data-c="#e8a4b8"></div>
-    <div class="pen-color" style="background:#e8a4b8" data-c="#e8a4b8"></div>
+    <div class="pen-color" style="background:#90c4e0" data-c="#90c4e0" title="Blue"></div>
     <div class="pen-color" style="background:#90c4e0" data-c="#90c4e0"></div>
-    <div class="pen-color" style="background:#90c4e0" data-c="#90c4e0"></div>
+    <div class="pen-color" style="background:#7ecaa0" data-c="#7ecaa0" title="Green"></div>
     <div class="pen-color" style="background:#7ecaa0" data-c="#7ecaa0"></div>
-    <div class="pen-color" style="background:#7ecaa0" data-c="#7ecaa0"></div>
+    <div class="pen-color" style="background:#b09cda" data-c="#b09cda" title="Purple"></div>
     <div class="pen-color" style="background:#b09cda" data-c="#b09cda"></div>
-    <div class="pen-color" style="background:#b09cda" data-c="#b09cda"></div>
+    <div class="pen-color" style="background:#d4a96a" data-c="#d4a96a" title="Gold"></div>
     <div class="pen-color" style="background:#d4a96a" data-c="#d4a96a"></div>
-    <div class="pen-color" style="background:#d4a96a" data-c="#d4a96a"></div>
-    <div class="pen-color" style="background:#e07878" data-c="#e07878"></div>
+    <div class="pen-color" style="background:#e07878" data-c="#e07878" title="Red"></div>
     <div class="pen-color" style="background:#e07878" data-c="#e07878"></div>
     <div style="flex:1"></div>
     <button class="tool-btn active" id="btnToolPen" onclick="setBoardTool('pen')">🖌️</button>
@@ -342,6 +343,29 @@ section.active { display:block; }
   <button onclick="showSec('board',this)"><span class="ni">🖍️</span>Board</button>
   <button onclick="showSec('rewards',this)"><span class="ni">🗝️</span>Exchange</button>
 </nav>
+
+<div class="overlay" id="overrideModal">
+  <div class="modal">
+    <div class="modal-title">Schedule Override</div>
+    <div class="row2">
+      <div><label>Date</label><input type="date" id="ov-date"></div>
+      <div><label>Who?</label><select id="ov-who"><option value="p1">Rebecca</option><option value="p2">Marius</option></select></div>
+    </div>
+    <label>Type</label>
+    <select id="ov-type" onchange="document.getElementById('ov-time-sec').style.display=this.value==='custom'?'grid':'none'">
+      <option value="off">Day Off</option>
+      <option value="custom">Custom Shift</option>
+    </select>
+    <div class="row2" id="ov-time-sec" style="display:none; margin-top:10px;">
+      <div><label>Start Time</label><input type="time" id="ov-start" value="09:00"></div>
+      <div><label>End Time</label><input type="time" id="ov-end" value="17:00"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('overrideModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addOverride()">Save Override</button>
+    </div>
+  </div>
+</div>
 
 <div class="overlay" id="cycleModal">
   <div class="modal">
@@ -483,17 +507,20 @@ section.active { display:block; }
 <div class="toast" id="toast"></div>
 
 <script>
-  if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed', err)); }); }
-</script>
-
-<script>
 // ═══════════════════════════════════
 // STATE & INIT
 // ═══════════════════════════════════
+const now = new Date();
+const todayISO = now.toISOString().slice(0,10);
+let selDate = todayISO;
+let tempSubtasks = [];
+let viewMode = 'month';
+let boardHistory = []; 
+
 const DEFAULT = {
   pts1: 0, pts2: 0, streak: 0,
   cycle: { periodStarts: [], dailyLogs: {}, defaultCycleLen: 28, defaultPeriodLen: 5, lutealPhase: 14 },
-  habits: [], events: [], togetherWindows: [],
+  habits: [], events: [], togetherWindows: [], scheduleOverrides: [],
   rewards: [ {id: 1, name: 'Cunnilingus', icon: '👅', cost: 100}, {id: 2, name: 'Mop the Floor', icon: '🧹', cost: 50} ],
   medsCheck: {}, boardImage: '', boardText: '', lastReset: '', selectedColor: '#b09cda'
 };
@@ -503,21 +530,17 @@ const P2_WORK = { 1:{start:'10:30',end:'19:00'}, 2:{start:'10:30',end:'19:00'}, 
 const DAYS3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 let S = deepClone(DEFAULT);
-const saved = localStorage.getItem('ct20'); 
+// CRITICAL: Bumping local storage key to ct22 to ensure clean state initialization.
+const saved = localStorage.getItem('ct22'); 
 if(saved){ try{ S = {...S, ...JSON.parse(saved)}; }catch(e){} }
 
 // Strict Fallbacks
 if(!S.habits) S.habits = []; if(!S.events) S.events = []; if(!S.rewards) S.rewards = [];
 if(!S.cycle) S.cycle = deepClone(DEFAULT.cycle); if(!S.cycle.dailyLogs) S.cycle.dailyLogs = {}; if(!S.medsCheck) S.medsCheck = {};
-if(!S.togetherWindows) S.togetherWindows = [];
+if(!S.togetherWindows) S.togetherWindows = []; if(!S.scheduleOverrides) S.scheduleOverrides = [];
 
-const now = new Date();
-const todayISO = now.toISOString().slice(0,10);
-let selDate = todayISO;
-let tempSubtasks = [];
-let viewMode = 'month';
 
-// ── Nightly Reset & Debt Logic (V20 Custom Days Guard) ──
+// ── Nightly Reset & Debt Logic ──
 if(S.lastReset !== todayISO){
   const todayDow = now.getDay();
   S.habits.forEach(h => {
@@ -550,7 +573,7 @@ document.getElementById('hdate').textContent = now.toLocaleDateString('en-US',{w
 document.getElementById('boardText').value = S.boardText || '';
 
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
-function save(){ localStorage.setItem('ct20', JSON.stringify(S)); }
+function save(){ localStorage.setItem('ct22', JSON.stringify(S)); }
 function n1(){ return document.getElementById('name1').value||'Rebecca'; }
 function n2(){ return document.getElementById('name2').value||'Marius'; }
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2400); }
@@ -564,16 +587,13 @@ function showSec(name, btn){
   if(name==='board') initBoard();
 }
 
-// V20: Scoped close cleanup
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ 
   document.getElementById(id).classList.remove('open'); 
   if(id === 'habitModal') { tempSubtasks = []; document.getElementById('subPreview').innerHTML = ''; }
 }
 document.querySelectorAll('.overlay').forEach(o=>{ o.addEventListener('click', e=>{ if(e.target===o) closeModal(o.id); }); });
-document.querySelectorAll('.pill').forEach(p => { p.addEventListener('click', () => { if(p.parentElement.id === 'logFlow' || p.parentElement.id === 'em-intimacy-acts') { /* Allows multi select for acts */ if (p.parentElement.id==='logFlow') { document.querySelectorAll('#logFlow .pill').forEach(el => { if(el!==p) el.classList.remove('active') }); } } p.classList.toggle('active'); }); });
-
-// Custom Days Toggle
+document.querySelectorAll('.pill').forEach(p => { p.addEventListener('click', () => { if(p.parentElement.id === 'logFlow' || p.parentElement.id === 'em-intimacy-acts') { if (p.parentElement.id==='logFlow') { document.querySelectorAll('#logFlow .pill').forEach(el => { if(el!==p) el.classList.remove('active') }); } } p.classList.toggle('active'); }); });
 document.querySelectorAll('#hm-custom-days .pill').forEach(p => { p.addEventListener('click', () => p.classList.toggle('active')); });
 
 function hexToRgba(hex, alpha) {
@@ -582,25 +602,136 @@ function hexToRgba(hex, alpha) {
 }
 
 // ═══════════════════════════════════
-// WORK STRIP
+// SCHEDULE OVERRIDES & WORK STRIP
 // ═══════════════════════════════════
+function getShift(dateStr, player) {
+  const dow = new Date(dateStr + 'T12:00:00').getDay();
+  const ov = S.scheduleOverrides.find(o => o.date === dateStr && o.who === player);
+  if (ov) {
+    if (ov.type === 'off') return { type: 'off', isOverride: true, ovId: ov.id };
+    return { start: ov.start, end: ov.end, type: 'custom', isOverride: true, ovId: ov.id };
+  }
+  const base = player === 'p1' ? P1_WORK[dow] : P2_WORK[dow];
+  if (base) return { start: base.start, end: base.end, type: 'normal', isOverride: false };
+  return { type: 'off', isOverride: false };
+}
+
+function openOverrideModal() {
+   document.getElementById('ov-date').value = selDate;
+   document.getElementById('ov-who').value = 'p1';
+   document.getElementById('ov-type').value = 'off';
+   document.getElementById('ov-time-sec').style.display = 'none';
+   document.getElementById('ov-start').value = '09:00';
+   document.getElementById('ov-end').value = '17:00';
+   openModal('overrideModal');
+}
+
+function addOverride() {
+   const date = document.getElementById('ov-date').value;
+   const who = document.getElementById('ov-who').value;
+   const type = document.getElementById('ov-type').value;
+   const start = document.getElementById('ov-start').value;
+   const end = document.getElementById('ov-end').value;
+
+   if(!date) return;
+   S.scheduleOverrides = S.scheduleOverrides.filter(o => !(o.date === date && o.who === who));
+   S.scheduleOverrides.push({ id: Date.now(), date, who, type, start: type==='custom'?start:null, end: type==='custom'?end:null });
+   save(); closeModal('overrideModal'); renderAll(); toast('Override Saved!');
+}
+
+function deleteOverride(id) {
+   S.scheduleOverrides = S.scheduleOverrides.filter(o => o.id !== id);
+   save(); renderAll(); toast('Override Removed');
+}
+
 function fmt12(t){ if(!t) return ''; const [h,m] = t.split(':'); const hr = parseInt(h); return `${hr>12?hr-12:hr||12}:${m}${hr>=12?'pm':'am'}`; }
+
 function renderWorkStrip(){
   const el = document.getElementById('workStrip'); el.innerHTML = ''; 
   const todayDow = now.getDay();
+  const dowAdjust = todayDow === 0 ? 6 : todayDow - 1; 
+  const baseDate = new Date(todayISO + 'T12:00:00');
+  const mondayDate = new Date(baseDate);
+  mondayDate.setDate(baseDate.getDate() - dowAdjust);
+
   for(let i=0; i<7; i++){
-    let targetDow = (1 + i) % 7; 
-    const w1 = P1_WORK[targetDow], w2 = P2_WORK[targetDow];
-    const d = document.createElement('div'); d.className = `wday ${targetDow === todayDow ? 'is-today' : ''}`;
-    let html1 = w1 ? `<div class="wday-shift shift-p1">${fmt12(w1.start)} - ${fmt12(w1.end)}</div>` : `<div class="wday-shift shift-off">Off</div>`;
-    let html2 = w2 ? `<div class="wday-shift shift-p2">${fmt12(w2.start)} - ${fmt12(w2.end)}</div>` : `<div class="wday-shift shift-off">Off</div>`;
-    d.innerHTML = `<div class="wday-name">${DAYS3[targetDow]}</div>${html1}${html2}`;
-    el.appendChild(d);
+    let d = new Date(mondayDate); d.setDate(mondayDate.getDate() + i);
+    let dStr = d.toISOString().slice(0,10);
+    let targetDow = d.getDay(); 
+
+    const s1 = getShift(dStr, 'p1');
+    const s2 = getShift(dStr, 'p2');
+    const isToday = dStr === todayISO;
+
+    const dEl = document.createElement('div'); dEl.className = `wday ${isToday ? 'is-today' : ''}`;
+    let html1 = s1.type !== 'off' ? `<div class="wday-shift shift-p1" ${s1.isOverride?'style="border:1px dashed var(--warning);"':''}>${s1.isOverride?'⚠️ ':''}${fmt12(s1.start)} - ${fmt12(s1.end)}</div>` : `<div class="wday-shift shift-off" ${s1.isOverride?'style="border:1px dashed var(--warning); color:var(--warning);"':''}>${s1.isOverride?'⚠️ ':''}Off</div>`;
+    let html2 = s2.type !== 'off' ? `<div class="wday-shift shift-p2" ${s2.isOverride?'style="border:1px dashed var(--warning);"':''}>${s2.isOverride?'⚠️ ':''}${fmt12(s2.start)} - ${fmt12(s2.end)}</div>` : `<div class="wday-shift shift-off" ${s2.isOverride?'style="border:1px dashed var(--warning); color:var(--warning);"':''}>${s2.isOverride?'⚠️ ':''}Off</div>`;
+
+    dEl.innerHTML = `<div class="wday-name">${DAYS3[targetDow]}</div>${html1}${html2}`;
+    el.appendChild(dEl);
   }
 }
 
 // ═══════════════════════════════════
-// QUESTS (V20 Sub-subs & Custom Days)
+// CYCLE MODAL & LOGIC
+// ═══════════════════════════════════
+function openCycleModal() {
+  const el = document.getElementById('cyHistoryList');
+  el.innerHTML = S.cycle.periodStarts.length ? S.cycle.periodStarts.map((d, i) => `<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>${d}</span><button onclick="S.cycle.periodStarts.splice(${i},1); save(); openCycleModal();" style="background:none; border:none; color:var(--danger); cursor:pointer;">✕</button></div>`).join('') : 'No past dates logged.';
+  document.getElementById('cy-len').value = S.cycle.defaultCycleLen; document.getElementById('cy-plen').value = S.cycle.defaultPeriodLen;
+  openModal('cycleModal');
+}
+function addCycleStart() { const d = document.getElementById('cy-add-date').value; if(d && !S.cycle.periodStarts.includes(d)) { S.cycle.periodStarts.push(d); S.cycle.periodStarts.sort(); save(); openCycleModal(); toast('Date Added'); document.getElementById('cy-add-date').value = ''; } }
+function clearCycleHistory() { if(confirm('Wipe all past cycle data?')) { S.cycle.periodStarts = []; S.cycle.dailyLogs = {}; save(); openCycleModal(); renderCalendar(); toast('History Cleared'); } }
+function saveCycle() { S.cycle.defaultCycleLen = parseInt(document.getElementById('cy-len').value) || 28; S.cycle.defaultPeriodLen = parseInt(document.getElementById('cy-plen').value) || 5; save(); closeModal('cycleModal'); renderCalendar(); renderEventList(); toast('Settings Saved'); }
+
+function openHealthModal() {
+  document.getElementById('logModalDateTitle').textContent = new Date(selDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  document.getElementById('logBBT').value = ''; document.getElementById('logCM').value = '';
+  const log = S.cycle.dailyLogs[selDate];
+  if (log) {
+    if(log.flow) document.querySelector(`#logFlow .pill[data-val="${log.flow}"]`)?.classList.add('active');
+    if(log.sex) log.sex.forEach(v => document.querySelector(`#logSex .pill[data-val="${v}"]`)?.classList.add('active'));
+    if(log.symp) log.symp.forEach(v => document.querySelector(`#logSymp .pill[data-val="${v}"]`)?.classList.add('active'));
+    if(log.bbt) document.getElementById('logBBT').value = log.bbt;
+    if(log.cm) document.getElementById('logCM').value = log.cm;
+  }
+  openModal('healthModal');
+}
+function saveHealthLog() {
+  const flow = document.querySelector('#logFlow .pill.active')?.dataset.val || null;
+  const sex = Array.from(document.querySelectorAll('#logSex .pill.active')).map(p => p.dataset.val);
+  const symp = Array.from(document.querySelectorAll('#logSymp .pill.active')).map(p => p.dataset.val);
+  const bbt = document.getElementById('logBBT').value; const cm = document.getElementById('logCM').value;
+  S.cycle.dailyLogs[selDate] = { flow, sex, symp, bbt, cm };
+  if (flow) {
+    const prevDay = new Date(new Date(selDate).setDate(new Date(selDate).getDate() - 1)).toISOString().slice(0,10);
+    if (!S.cycle.dailyLogs[prevDay]?.flow && !S.cycle.periodStarts.includes(selDate)) { S.cycle.periodStarts.push(selDate); S.cycle.periodStarts.sort(); }
+  }
+  save(); closeModal('healthModal'); renderCalendar(); renderEventList(); toast('Health Logged 📋');
+}
+
+function getDynamicAverages() {
+  const starts = S.cycle.periodStarts; if (starts.length < 2) return S.cycle.defaultCycleLen;
+  let totalDays = 0; for(let i=1; i < starts.length; i++) { totalDays += Math.floor((new Date(starts[i]) - new Date(starts[i-1])) / 86400000); }
+  return Math.round(totalDays / (starts.length - 1));
+}
+function getCyclePhase(targetDateStr) {
+  if (!S.cycle || !S.cycle.periodStarts || S.cycle.periodStarts.length === 0) return null;
+  const pastStarts = S.cycle.periodStarts.filter(d => d <= targetDateStr).sort();
+  if (pastStarts.length === 0) return null; 
+  const diffDays = Math.floor((new Date(targetDateStr) - new Date(pastStarts[pastStarts.length - 1])) / 86400000);
+  const dynCycleLen = getDynamicAverages(); const cd = (diffDays % dynCycleLen) + 1; const od = dynCycleLen - S.cycle.lutealPhase; 
+  if (S.cycle.dailyLogs[targetDateStr]?.flow) return { phase: 'period', color: 'rgba(224, 120, 120, 0.2)', icon: '🩸', day: cd };
+  if (cd <= S.cycle.defaultPeriodLen) return { phase: 'period prediction', color: 'rgba(224, 120, 120, 0.1)', icon: '🩸', day: cd };
+  if (cd === od) return { phase: 'ovulation', color: 'rgba(212, 169, 106, 0.4)', icon: '✨', day: cd };
+  if (cd >= od - 4 && cd <= od + 1) return { phase: 'fertile window', color: 'rgba(176, 156, 218, 0.2)', icon: '🌸', day: cd };
+  return { phase: 'default', color: 'transparent', icon: '', day: cd }; 
+}
+
+// ═══════════════════════════════════
+// QUESTS
 // ═══════════════════════════════════
 function renderSubPreview() { document.getElementById('subPreview').innerHTML = tempSubtasks.map((s,i) => `<div class="step-preview-item"><span>${s.text}</span><button onclick="tempSubtasks.splice(${i},1); renderSubPreview();" style="background:none;border:none;color:var(--danger);cursor:pointer;">✕</button></div>`).join(''); }
 function addSubtask(){ const inp = document.getElementById('hm-sub-input'); if(!inp.value.trim()) return; tempSubtasks.push({ id: Date.now(), text: inp.value.trim(), done: false, subs: [] }); inp.value = ''; renderSubPreview(); }
@@ -910,22 +1041,29 @@ function renderEventList(){
   try {
     const el = document.getElementById('eventList'); el.innerHTML='';
     const selEvents = S.events.filter(e=>e.date===selDate).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
-    const targetDow = new Date(selDate + 'T12:00:00').getDay(); const w1 = P1_WORK[targetDow], w2 = P2_WORK[targetDow];
+    const s1Day = getShift(selDate, 'p1'); const s2Day = getShift(selDate, 'p2');
     if(!S.medsCheck[selDate]) S.medsCheck[selDate] = {p1:false, p2:false};
     
-    // Together Windows Inject
     const activeTw = S.togetherWindows.filter(w => selDate >= w.start && selDate <= w.end);
     
     if (viewMode === 'day') {
       el.innerHTML=`<div class="event-day-header">Daily Schedule</div>`;
+      
+      if (s1Day.isOverride) {
+        el.innerHTML += `<div class="event-item ov-block" style="border-left-color:var(--warning); background:rgba(224,184,120,0.05);"><div class="ev-time" style="font-size:1rem;">⚠️</div><div class="ev-body"><div class="ev-title" style="color:var(--warning);">Shift Override</div><div class="ev-who">${n1()} • ${s1Day.type==='off'?'Day Off' : fmt12(s1Day.start)+' - '+fmt12(s1Day.end)}</div></div><button class="del-btn" onclick="deleteOverride(${s1Day.ovId})">✕</button></div>`;
+      }
+      if (s2Day.isOverride) {
+        el.innerHTML += `<div class="event-item ov-block" style="border-left-color:var(--warning); background:rgba(224,184,120,0.05);"><div class="ev-time" style="font-size:1rem;">⚠️</div><div class="ev-body"><div class="ev-title" style="color:var(--warning);">Shift Override</div><div class="ev-who">${n2()} • ${s2Day.type==='off'?'Day Off' : fmt12(s2Day.start)+' - '+fmt12(s2Day.end)}</div></div><button class="del-btn" onclick="deleteOverride(${s2Day.ovId})">✕</button></div>`;
+      }
+
       activeTw.forEach(tw => {
           el.innerHTML += `<div class="event-item tw-block" style="border-left-color:${tw.color};"><div class="ev-time" style="font-size:1rem;">🤎</div><div class="ev-body"><div class="ev-title" style="color:${tw.color};">Together Window</div><div class="ev-who">${tw.label || 'Shared Time'}</div></div><button class="del-btn" onclick="S.togetherWindows=S.togetherWindows.filter(x=>x.id!==${tw.id}); save(); renderCalendar(); renderEventList();">✕</button></div>`;
       });
-      if(w1) el.innerHTML+= `<div class="med-item"><button class="med-check ${S.medsCheck[selDate].p1?'done':''}" onclick="toggleMed('${selDate}','p1')">✓</button><div class="med-text ${S.medsCheck[selDate].p1?'done':''}">${fmt12(w1.start)} - ${n1()}'s Meds</div></div>`;
-      if(w2) el.innerHTML+= `<div class="med-item"><button class="med-check ${S.medsCheck[selDate].p2?'done':''}" onclick="toggleMed('${selDate}','p2')">✓</button><div class="med-text ${S.medsCheck[selDate].p2?'done':''}">${fmt12(w2.start)} - ${n2()}'s Meds</div></div>`;
+      if(s1Day.type !== 'off') el.innerHTML+= `<div class="med-item"><button class="med-check ${S.medsCheck[selDate].p1?'done':''}" onclick="toggleMed('${selDate}','p1')">✓</button><div class="med-text ${S.medsCheck[selDate].p1?'done':''}">${fmt12(s1Day.start)} - ${n1()}'s Meds</div></div>`;
+      if(s2Day.type !== 'off') el.innerHTML+= `<div class="med-item"><button class="med-check ${S.medsCheck[selDate].p2?'done':''}" onclick="toggleMed('${selDate}','p2')">✓</button><div class="med-text ${S.medsCheck[selDate].p2?'done':''}">${fmt12(s2Day.start)} - ${n2()}'s Meds</div></div>`;
     } else { el.innerHTML=`<div class="event-day-header">${selDate===todayISO ? 'Today' : new Date(selDate+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</div>`; }
     
-    if(!selEvents.length && !w1 && !w2 && activeTw.length === 0 && viewMode === 'day') el.innerHTML+=`<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No events scheduled</div>`;
+    if(!selEvents.length && s1Day.type === 'off' && s2Day.type === 'off' && activeTw.length === 0 && viewMode === 'day') el.innerHTML+=`<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No events scheduled</div>`;
     else if(!selEvents.length && viewMode !== 'day') el.innerHTML+=`<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No events scheduled</div>`;
     selEvents.forEach(ev=>el.appendChild(makeEventEl(ev)));
 
@@ -983,10 +1121,10 @@ function renderRewards(){
 }
 
 // ═══════════════════════════════════
-// WHITEBOARD (V20 Upgrades)
+// WHITEBOARD
 // ═══════════════════════════════════
 const canvas = document.getElementById('whiteboard'); const ctx = canvas.getContext('2d'); 
-let isDrawing = false; let boardColor = '#0d0c0f'; let activeTool = 'pen'; let boardSaveTimeout; let boardHistory = [];
+let isDrawing = false; let boardColor = '#0d0c0f'; let activeTool = 'pen'; let boardSaveTimeout;
 
 function initBoard() { if (S.boardImage) { const img = new Image(); img.onload = () => { ctx.drawImage(img, 0, 0); saveBoardState(); }; img.src = S.boardImage; } else { saveBoardState(); } }
 
@@ -1004,7 +1142,7 @@ function undoBoard() {
   if (boardHistory.length > 1) {
     boardHistory.pop(); ctx.putImageData(boardHistory[boardHistory.length - 1], 0, 0); S.boardImage = canvas.toDataURL(); save();
   } else if (boardHistory.length === 1) {
-    ctx.clearRect(0,0,canvas.width,canvas.height); boardHistory = []; saveBoardState(); S.boardImage = ''; save();
+    ctx.clearRect(0,0,canvas.width,canvas.height); S.boardImage = ''; save();
   }
 }
 
@@ -1015,7 +1153,7 @@ function floodFill(startX, startY, hexColor) {
   const startIdx = (startY * w + startX) * 4;
   const sr = data[startIdx], sg = data[startIdx+1], sb = data[startIdx+2], sa = data[startIdx+3];
 
-  if (Math.abs(sr-r)<=30 && Math.abs(sg-g)<=30 && Math.abs(sb-b)<=30) { toast('Area is already this color! 🪣'); return; }
+  if (sr === r && sg === g && sb === b) { toast('Area is already this color! 🪣'); return; }
   
   const q = [[startX, startY]]; const seen = new Uint8Array(w * h); seen[startY * w + startX] = 1;
   while(q.length > 0) {
@@ -1034,7 +1172,7 @@ function startDraw(e) {
   e.preventDefault(); const rect = canvas.getBoundingClientRect(); const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; 
   const x = (clientX - rect.left) * (canvas.width / rect.width); const y = (clientY - rect.top) * (canvas.height / rect.height); 
   
-  saveBoardState(); // Capture for undo BEFORE action
+  saveBoardState(); 
   
   if (activeTool === 'fill') { floodFill(x, y, boardColor); return; }
   isDrawing = true; draw(e); 
