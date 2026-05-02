@@ -98,7 +98,7 @@ section.active { display:block; }
 .subtasks-container { display: none; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); width:100%; }
 .subtasks-container.open { display: block; animation: fadeUp 0.2s ease; }
 .sub-item { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; margin-bottom: 6px; }
-.sub-chk { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.6rem; color: transparent; transition: all 0.2s; }
+.sub-chk { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.6rem; color: transparent; transition: all 0.2s; flex-shrink:0; }
 .sub-chk.done { background: var(--sharedbg); border-color: var(--shared); color: var(--shared); }
 .expand-btn { background: none; border: none; color: var(--muted); font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
 .del-btn, .edit-btn { background:none; border:none; color:var(--muted); font-size:0.75rem; cursor:pointer; opacity:0.5; padding:2px; }
@@ -121,6 +121,7 @@ section.active { display:block; }
 .cal-bar-text { width:92%; height:12px; border-radius:3px; font-size:0.5rem; line-height:12px; color:#fff; overflow:hidden; white-space:nowrap; padding:0 3px; text-align:left; pointer-events:none; }
 .cal-work { position:absolute; bottom:0; left:0; right:0; height:3px; opacity:0.6; }
 .cal-log-icons { position:absolute; top:2px; right:4px; font-size:0.55rem; opacity:0.8; display:flex; gap:2px; pointer-events:none; }
+.tw-banner { width:100%; font-size:0.5rem; background:rgba(255,255,255,0.15); text-align:center; color:#fff; position:absolute; top:0; left:0; z-index:0; padding:1px 0; white-space:nowrap; overflow:hidden; }
 
 .cal-legend { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; background:var(--card2); border-radius:8px; padding:10px; font-size:0.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:14px; }
 .cal-legend div { display:flex; align-items:center; gap:4px; }
@@ -130,6 +131,7 @@ section.active { display:block; }
 .event-day-header { font-size:0.68rem; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin:14px 0 7px; display:flex; align-items:center; gap:8px; }
 .event-day-header::after { content:''; flex:1; height:1px; background:var(--border); }
 .event-item { background:var(--card); border-radius:var(--radius-sm); padding:11px 12px; margin-bottom:6px; display:flex; align-items:center; gap:10px; border:1px solid var(--border); border-left:3px solid; }
+.event-item.tw-block { border-style:dashed; border-color:var(--border2); }
 .ev-time { font-size:0.7rem; color:var(--muted); width:42px; flex-shrink:0; text-align:center; }
 .ev-body { flex:1; }
 .ev-title { font-size:0.85rem; font-weight:500; }
@@ -142,9 +144,11 @@ section.active { display:block; }
 
 /* ── WHITEBOARD ── */
 .board-container { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:#fff; touch-action:none; position:relative; }
-.board-tools { display:flex; gap:8px; margin-top:10px; align-items:center; flex-wrap:wrap; }
-.pen-color { width:24px; height:24px; border-radius:50%; border:2px solid transparent; cursor:pointer; }
+.board-tools { display:flex; gap:6px; margin-top:10px; align-items:center; flex-wrap:wrap; }
+.pen-color { width:22px; height:22px; border-radius:50%; border:2px solid transparent; cursor:pointer; }
 .pen-color.sel { border-color:var(--text); transform:scale(1.1); }
+.tool-btn { background:var(--card2); color:var(--muted); border:1px solid var(--border2); padding:6px; border-radius:6px; font-size:0.7rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.tool-btn.active { color:var(--shared); border-color:var(--shared); background:var(--sharedbg); }
 #boardText { width:100%; min-height:100px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-b); font-size:0.85rem; padding:12px; resize:vertical; margin-top:14px; outline:none; }
 
 /* ── TRIBUTES (EXCHANGE) ── */
@@ -196,7 +200,7 @@ section.active { display:block; }
 <div class="app">
 
 <header>
-  <div style="position:absolute; top:12px; right:14px; font-size:0.6rem; color:var(--muted2); font-family:monospace; font-weight:600;">v19</div>
+  <div style="position:absolute; top:12px; right:14px; font-size:0.6rem; color:var(--muted2); font-family:monospace; font-weight:600;">v20</div>
   <div class="logo">us <span>🤎</span></div>
   <div class="hdate" id="hdate"></div>
   <div class="streak">🔥 <span id="streakN">0</span> day streak</div>
@@ -225,7 +229,6 @@ section.active { display:block; }
   
   <div class="sec-head"><div class="sec-title">Work Week</div></div>
   <div class="work-strip" id="workStrip"></div>
-  
   <div id="dashNotifs" style="margin-bottom:18px;"></div>
   
   <div class="sec-head" style="margin-top:20px;"><div class="sec-title">Today's Schedule</div></div>
@@ -262,7 +265,8 @@ section.active { display:block; }
   <div id="calHeaderControls" class="sec-head">
     <div class="sec-title">Calendar & Cycle</div>
     <div style="display:flex; gap:4px;">
-      <button class="sec-add" onclick="openHealthModal()" style="color:var(--p1); border-color:var(--p1);">+ Log Health</button>
+      <button class="sec-add" onclick="openModal('togetherModal')" style="color:var(--success); border-color:var(--success);">+ Together</button>
+      <button class="sec-add" onclick="openHealthModal()" style="color:var(--p1); border-color:var(--p1);">+ Health</button>
       <button class="sec-add" onclick="openCycleModal()">⚙️</button>
       <button class="sec-add" onclick="openEventModal()">+ Event</button>
     </div>
@@ -295,18 +299,30 @@ section.active { display:block; }
 <section id="sec-board">
   <div class="sec-head"><div class="sec-title">Daily Board</div><div style="font-size:0.6rem; color:var(--muted);">Resets at Midnight</div></div>
   <div class="board-container"><canvas id="whiteboard" width="450" height="350"></canvas></div>
-  <div class="board-tools">
-    <div class="pen-color sel" style="background:#0d0c0f" data-c="#0d0c0f" title="Black"></div>
+  <div class="board-tools" id="boardToolbox">
+    <div class="pen-color sel" style="background:#0d0c0f" data-c="#0d0c0f"></div>
+    <div class="pen-color" style="background:#0d0c0f" data-c="#0d0c0f"></div>
     <div class="pen-color" style="background:#ffffff; border-color:var(--border2);" data-c="#ffffff" title="White / Eraser"></div>
-    <div class="pen-color" style="background:#b58b66" data-c="#b58b66" title="Light Brown"></div>
-    <div class="pen-color" style="background:#e8a4b8" data-c="#e8a4b8" title="Pink"></div>
-    <div class="pen-color" style="background:#90c4e0" data-c="#90c4e0" title="Blue"></div>
-    <div class="pen-color" style="background:#7ecaa0" data-c="#7ecaa0" title="Green"></div>
-    <div class="pen-color" style="background:#b09cda" data-c="#b09cda" title="Purple"></div>
-    <div class="pen-color" style="background:#d4a96a" data-c="#d4a96a" title="Gold"></div>
-    <div class="pen-color" style="background:#e07878" data-c="#e07878" title="Red"></div>
+    <div class="pen-color" style="background:#ffffff; border-color:var(--border2);" data-c="#ffffff"></div>
+    <div class="pen-color" style="background:#b58b66" data-c="#b58b66"></div>
+    <div class="pen-color" style="background:#b58b66" data-c="#b58b66"></div>
+    <div class="pen-color" style="background:#e8a4b8" data-c="#e8a4b8"></div>
+    <div class="pen-color" style="background:#e8a4b8" data-c="#e8a4b8"></div>
+    <div class="pen-color" style="background:#90c4e0" data-c="#90c4e0"></div>
+    <div class="pen-color" style="background:#90c4e0" data-c="#90c4e0"></div>
+    <div class="pen-color" style="background:#7ecaa0" data-c="#7ecaa0"></div>
+    <div class="pen-color" style="background:#7ecaa0" data-c="#7ecaa0"></div>
+    <div class="pen-color" style="background:#b09cda" data-c="#b09cda"></div>
+    <div class="pen-color" style="background:#b09cda" data-c="#b09cda"></div>
+    <div class="pen-color" style="background:#d4a96a" data-c="#d4a96a"></div>
+    <div class="pen-color" style="background:#d4a96a" data-c="#d4a96a"></div>
+    <div class="pen-color" style="background:#e07878" data-c="#e07878"></div>
+    <div class="pen-color" style="background:#e07878" data-c="#e07878"></div>
     <div style="flex:1"></div>
-    <button class="btn btn-ghost" style="padding:6px; font-size:0.7rem" onclick="clearBoard()">Clear</button>
+    <button class="tool-btn active" id="btnToolPen" onclick="setBoardTool('pen')">🖌️</button>
+    <button class="tool-btn" id="btnToolFill" onclick="setBoardTool('fill')">🪣</button>
+    <button class="tool-btn" onclick="undoBoard()">↩</button>
+    <button class="btn btn-ghost" style="padding:6px; font-size:0.7rem; height:28px;" onclick="clearBoard()">Clear</button>
   </div>
   <textarea id="boardText" placeholder="Leave a note here..." oninput="saveBoardText()"></textarea>
 </section>
@@ -373,8 +389,20 @@ section.active { display:block; }
       <div><label>Assigned To</label><select id="hm-who"><option value="both">Both</option><option value="p1">Rebecca</option><option value="p2">Marius</option></select></div>
     </div>
     <div class="row2">
-      <div><label>Frequency</label><select id="hm-freq"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="interval">Every 3 Days</option><option value="none">One-off Quest</option></select></div>
+      <div>
+        <label>Frequency</label>
+        <select id="hm-freq" onchange="document.getElementById('hm-custom-days-sec').style.display = this.value==='custom'?'block':'none'">
+          <option value="daily">Daily</option><option value="custom">Custom Days</option><option value="none">One-off Quest</option>
+        </select>
+      </div>
       <div><label>Points Value</label><input type="number" id="hm-pts" value="20" min="1"></div>
+    </div>
+    
+    <div id="hm-custom-days-sec" style="display:none;">
+      <label>Active Days</label>
+      <div class="pill-opts" id="hm-custom-days">
+        <div class="pill" data-day="0">Su</div><div class="pill" data-day="1">Mo</div><div class="pill" data-day="2">Tu</div><div class="pill" data-day="3">We</div><div class="pill" data-day="4">Th</div><div class="pill" data-day="5">Fr</div><div class="pill" data-day="6">Sa</div>
+      </div>
     </div>
     
     <label>Progress & Cooldown (Optional)</label>
@@ -386,7 +414,7 @@ section.active { display:block; }
     <label>Deadline & Calendar Link (Optional)</label>
     <div class="row2"><div><input type="date" id="hm-date"></div><div><input type="time" id="hm-time"></div></div>
     
-    <label>Add Subtasks (optional)</label>
+    <label>Subtasks</label>
     <div class="step-input-row"><input type="text" id="hm-sub-input" placeholder="e.g. No onions on burgers"><button class="step-add-btn" onclick="addSubtask()">+ Add</button></div>
     <div class="steps-preview" id="subPreview"></div>
     <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('habitModal')">Cancel</button><button class="btn btn-primary" onclick="addHabit()">Save Quest</button></div>
@@ -403,12 +431,42 @@ section.active { display:block; }
     <div class="row2"><div><label>End Time (opt)</label><input type="time" id="em-end"></div><div><label>Who?</label><select id="em-who"><option value="both">Both</option><option value="p1">Rebecca</option><option value="p2">Marius</option></select></div></div>
     
     <label style="display:flex; align-items:center; gap:8px; margin-top:14px; font-size:0.75rem;">
-      <input type="checkbox" id="em-intimacy" style="width:auto; transform:scale(1.2);"> Schedule Intimacy 🤍
+      <input type="checkbox" id="em-intimacy" onchange="document.getElementById('em-intimacy-section').style.display=this.checked?'block':'none'" style="width:auto; transform:scale(1.2);"> Schedule Intimacy 🤍
     </label>
 
-    <label>Color</label>
+    <div id="em-intimacy-section" style="display:none; margin-top:10px; padding:10px; background:var(--card2); border-radius:8px; border:1px solid var(--border2);">
+      <label style="margin-top:0;">Planned Acts</label>
+      <div class="pill-opts" id="em-intimacy-acts">
+        <div class="pill" data-val="piv">PIV</div><div class="pill" data-val="fellatio">Fellatio</div><div class="pill" data-val="cunnilingus">Cunnilingus</div><div class="pill" data-val="anal">Anal</div><div class="pill" data-val="mutual">Mutual</div><div class="pill" data-val="toys">Toys</div>
+      </div>
+      <label>Dynamic Type</label>
+      <select id="em-intimacy-type" onchange="document.getElementById('em-intimacy-pts-sec').style.display=(this.value==='reward'||this.value==='punishment')?'grid':'none'">
+        <option value="spontaneous">Spontaneous</option><option value="reward">Reward (Receiver gets Pts)</option><option value="punishment">Punishment (Receiver loses Pts)</option>
+      </select>
+      <div id="em-intimacy-pts-sec" class="row2" style="display:none; margin-top:10px;">
+        <div><label style="margin-top:0;">Points</label><input type="number" id="em-intimacy-pts" value="50"></div>
+        <div><label style="margin-top:0;">Target Person</label><select id="em-intimacy-who"><option value="p1">Rebecca</option><option value="p2">Marius</option></select></div>
+      </div>
+      <label style="display:flex; align-items:center; gap:8px; margin-top:12px; font-size:0.7rem; color:var(--text); text-transform:none;">
+        <input type="checkbox" id="em-intimacy-deferred" style="width:auto; transform:scale(1.1);" checked> Require manual completion to process points
+      </label>
+    </div>
+
+    <label>Event Color</label>
     <div class="color-opts" id="colorOpts"><div class="color-opt swatch-shared sel" data-c="#b09cda" onclick="pickColor(this)"></div><div class="color-opt swatch-p1" data-c="#e8a4b8" onclick="pickColor(this)"></div><div class="color-opt swatch-p2" data-c="#90c4e0" onclick="pickColor(this)"></div><div class="color-opt swatch-gold" data-c="#d4a96a" onclick="pickColor(this)"></div><div class="color-opt swatch-success" data-c="#7ecaa0" onclick="pickColor(this)"></div></div>
     <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('eventModal')">Cancel</button><button class="btn btn-primary" onclick="addEvent()">Save Event</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="togetherModal">
+  <div class="modal">
+    <div class="modal-title">New Together Window</div>
+    <label>Label / Location (Optional)</label>
+    <input type="text" id="tw-label" placeholder="e.g. His place 🏠 / Vacation">
+    <div class="row2"><div><label>Start Date</label><input type="date" id="tw-start"></div><div><label>End Date</label><input type="date" id="tw-end"></div></div>
+    <label>Highlight Color</label>
+    <div class="color-opts" id="twColorOpts"><div class="color-opt swatch-shared sel" data-c="#b09cda" onclick="pickTwColor(this)"></div><div class="color-opt swatch-success" data-c="#7ecaa0" onclick="pickTwColor(this)"></div><div class="color-opt swatch-p1" data-c="#e8a4b8" onclick="pickTwColor(this)"></div></div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('togetherModal')">Cancel</button><button class="btn btn-primary" onclick="addTogetherWindow()">Save Window</button></div>
   </div>
 </div>
 
@@ -435,7 +493,7 @@ section.active { display:block; }
 const DEFAULT = {
   pts1: 0, pts2: 0, streak: 0,
   cycle: { periodStarts: [], dailyLogs: {}, defaultCycleLen: 28, defaultPeriodLen: 5, lutealPhase: 14 },
-  habits: [], events: [],
+  habits: [], events: [], togetherWindows: [],
   rewards: [ {id: 1, name: 'Cunnilingus', icon: '👅', cost: 100}, {id: 2, name: 'Mop the Floor', icon: '🧹', cost: 50} ],
   medsCheck: {}, boardImage: '', boardText: '', lastReset: '', selectedColor: '#b09cda'
 };
@@ -445,12 +503,13 @@ const P2_WORK = { 1:{start:'10:30',end:'19:00'}, 2:{start:'10:30',end:'19:00'}, 
 const DAYS3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 let S = deepClone(DEFAULT);
-const saved = localStorage.getItem('ct19'); 
+const saved = localStorage.getItem('ct20'); 
 if(saved){ try{ S = {...S, ...JSON.parse(saved)}; }catch(e){} }
 
 // Strict Fallbacks
 if(!S.habits) S.habits = []; if(!S.events) S.events = []; if(!S.rewards) S.rewards = [];
 if(!S.cycle) S.cycle = deepClone(DEFAULT.cycle); if(!S.cycle.dailyLogs) S.cycle.dailyLogs = {}; if(!S.medsCheck) S.medsCheck = {};
+if(!S.togetherWindows) S.togetherWindows = [];
 
 const now = new Date();
 const todayISO = now.toISOString().slice(0,10);
@@ -458,16 +517,17 @@ let selDate = todayISO;
 let tempSubtasks = [];
 let viewMode = 'month';
 
-// ── Nightly Reset & Debt Deduction Logic ──
+// ── Nightly Reset & Debt Logic (V20 Custom Days Guard) ──
 if(S.lastReset !== todayISO){
-  const isMonday = now.getDay() === 1;
+  const todayDow = now.getDay();
   S.habits.forEach(h => {
     let shouldReset = false;
     if (h.freq === 'daily') shouldReset = true;
-    if (h.freq === 'weekly' && isMonday) shouldReset = true;
-    if (h.freq === 'interval' && h.lastDoneDate) {
-      if ((now - new Date(h.lastDoneDate)) > 3 * 86400000) shouldReset = true;
-    }
+    if (h.freq === 'custom' && h.customDays && h.customDays.includes(todayDow)) shouldReset = true;
+    
+    // Legacy support
+    if (h.freq === 'weekly' && now.getDay() === 1) shouldReset = true;
+    if (h.freq === 'interval' && h.lastDoneDate && (now - new Date(h.lastDoneDate)) > 3 * 86400000) shouldReset = true;
     
     if(shouldReset) { 
       if (h.freq !== 'none') {
@@ -477,10 +537,10 @@ if(S.lastReset !== todayISO){
         if(p2Fail) S.pts2 -= h.pts; 
       }
       h.d1 = 0; h.d2 = 0; h.c1 = 0; h.c2 = 0; h.lastT1 = 0; h.lastT2 = 0; 
-      if(h.subtasks) h.subtasks.forEach(s => s.done = false); 
+      if(h.subtasks) h.subtasks.forEach(s => { s.done = false; if(s.subs) s.subs.forEach(ss => ss.done = false); }); 
     }
   });
-  S.boardImage = ''; S.boardText = ''; 
+  S.boardImage = ''; S.boardText = ''; boardHistory = []; 
   S.lastReset = todayISO; 
   S.habits = S.habits.filter(h => !h.deletedAt || (Date.now() - h.deletedAt < 86400000));
   save();
@@ -490,7 +550,7 @@ document.getElementById('hdate').textContent = now.toLocaleDateString('en-US',{w
 document.getElementById('boardText').value = S.boardText || '';
 
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
-function save(){ localStorage.setItem('ct19', JSON.stringify(S)); }
+function save(){ localStorage.setItem('ct20', JSON.stringify(S)); }
 function n1(){ return document.getElementById('name1').value||'Rebecca'; }
 function n2(){ return document.getElementById('name2').value||'Marius'; }
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2400); }
@@ -504,10 +564,22 @@ function showSec(name, btn){
   if(name==='board') initBoard();
 }
 
+// V20: Scoped close cleanup
 function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); tempSubtasks = []; document.getElementById('subPreview').innerHTML = ''; }
+function closeModal(id){ 
+  document.getElementById(id).classList.remove('open'); 
+  if(id === 'habitModal') { tempSubtasks = []; document.getElementById('subPreview').innerHTML = ''; }
+}
 document.querySelectorAll('.overlay').forEach(o=>{ o.addEventListener('click', e=>{ if(e.target===o) closeModal(o.id); }); });
-document.querySelectorAll('.pill').forEach(p => { p.addEventListener('click', () => { if(p.parentElement.id === 'logFlow') { document.querySelectorAll('#logFlow .pill').forEach(el => { if(el!==p) el.classList.remove('active') }); } p.classList.toggle('active'); }); });
+document.querySelectorAll('.pill').forEach(p => { p.addEventListener('click', () => { if(p.parentElement.id === 'logFlow' || p.parentElement.id === 'em-intimacy-acts') { /* Allows multi select for acts */ if (p.parentElement.id==='logFlow') { document.querySelectorAll('#logFlow .pill').forEach(el => { if(el!==p) el.classList.remove('active') }); } } p.classList.toggle('active'); }); });
+
+// Custom Days Toggle
+document.querySelectorAll('#hm-custom-days .pill').forEach(p => { p.addEventListener('click', () => p.classList.toggle('active')); });
+
+function hexToRgba(hex, alpha) {
+  let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
 // ═══════════════════════════════════
 // WORK STRIP
@@ -528,80 +600,23 @@ function renderWorkStrip(){
 }
 
 // ═══════════════════════════════════
-// CYCLE MODAL & LOGIC
-// ═══════════════════════════════════
-function openCycleModal() {
-  const el = document.getElementById('cyHistoryList');
-  el.innerHTML = S.cycle.periodStarts.length ? S.cycle.periodStarts.map((d, i) => `<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>${d}</span><button onclick="S.cycle.periodStarts.splice(${i},1); save(); openCycleModal();" style="background:none; border:none; color:var(--danger); cursor:pointer;">✕</button></div>`).join('') : 'No past dates logged.';
-  document.getElementById('cy-len').value = S.cycle.defaultCycleLen; document.getElementById('cy-plen').value = S.cycle.defaultPeriodLen;
-  openModal('cycleModal');
-}
-function addCycleStart() { const d = document.getElementById('cy-add-date').value; if(d && !S.cycle.periodStarts.includes(d)) { S.cycle.periodStarts.push(d); S.cycle.periodStarts.sort(); save(); openCycleModal(); toast('Date Added'); document.getElementById('cy-add-date').value = ''; } }
-function clearCycleHistory() { if(confirm('Wipe all past cycle data?')) { S.cycle.periodStarts = []; S.cycle.dailyLogs = {}; save(); openCycleModal(); renderCalendar(); toast('History Cleared'); } }
-function saveCycle() { S.cycle.defaultCycleLen = parseInt(document.getElementById('cy-len').value) || 28; S.cycle.defaultPeriodLen = parseInt(document.getElementById('cy-plen').value) || 5; save(); closeModal('cycleModal'); renderCalendar(); renderEventList(); toast('Settings Saved'); }
-
-function openHealthModal() {
-  document.getElementById('logModalDateTitle').textContent = new Date(selDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-  document.getElementById('logBBT').value = ''; document.getElementById('logCM').value = '';
-  const log = S.cycle.dailyLogs[selDate];
-  if (log) {
-    if(log.flow) document.querySelector(`#logFlow .pill[data-val="${log.flow}"]`)?.classList.add('active');
-    if(log.sex) log.sex.forEach(v => document.querySelector(`#logSex .pill[data-val="${v}"]`)?.classList.add('active'));
-    if(log.symp) log.symp.forEach(v => document.querySelector(`#logSymp .pill[data-val="${v}"]`)?.classList.add('active'));
-    if(log.bbt) document.getElementById('logBBT').value = log.bbt;
-    if(log.cm) document.getElementById('logCM').value = log.cm;
-  }
-  openModal('healthModal');
-}
-function saveHealthLog() {
-  const flow = document.querySelector('#logFlow .pill.active')?.dataset.val || null;
-  const sex = Array.from(document.querySelectorAll('#logSex .pill.active')).map(p => p.dataset.val);
-  const symp = Array.from(document.querySelectorAll('#logSymp .pill.active')).map(p => p.dataset.val);
-  const bbt = document.getElementById('logBBT').value; const cm = document.getElementById('logCM').value;
-  S.cycle.dailyLogs[selDate] = { flow, sex, symp, bbt, cm };
-  if (flow) {
-    const prevDay = new Date(new Date(selDate).setDate(new Date(selDate).getDate() - 1)).toISOString().slice(0,10);
-    if (!S.cycle.dailyLogs[prevDay]?.flow && !S.cycle.periodStarts.includes(selDate)) { S.cycle.periodStarts.push(selDate); S.cycle.periodStarts.sort(); }
-  }
-  save(); closeModal('healthModal'); renderCalendar(); renderEventList(); toast('Health Logged 📋');
-}
-
-function getDynamicAverages() {
-  const starts = S.cycle.periodStarts; if (starts.length < 2) return S.cycle.defaultCycleLen;
-  let totalDays = 0; for(let i=1; i < starts.length; i++) { totalDays += Math.floor((new Date(starts[i]) - new Date(starts[i-1])) / 86400000); }
-  return Math.round(totalDays / (starts.length - 1));
-}
-function getCyclePhase(targetDateStr) {
-  if (S.cycle.periodStarts.length === 0) return null;
-  const pastStarts = S.cycle.periodStarts.filter(d => d <= targetDateStr).sort();
-  if (pastStarts.length === 0) return null; 
-  const diffDays = Math.floor((new Date(targetDateStr) - new Date(pastStarts[pastStarts.length - 1])) / 86400000);
-  const dynCycleLen = getDynamicAverages(); const cd = (diffDays % dynCycleLen) + 1; const od = dynCycleLen - S.cycle.lutealPhase; 
-  if (S.cycle.dailyLogs[targetDateStr]?.flow) return { phase: 'period', color: 'rgba(224, 120, 120, 0.2)', icon: '🩸', day: cd };
-  if (cd <= S.cycle.defaultPeriodLen) return { phase: 'period prediction', color: 'rgba(224, 120, 120, 0.1)', icon: '🩸', day: cd };
-  if (cd === od) return { phase: 'ovulation', color: 'rgba(212, 169, 106, 0.4)', icon: '✨', day: cd };
-  if (cd >= od - 4 && cd <= od + 1) return { phase: 'fertile window', color: 'rgba(176, 156, 218, 0.2)', icon: '🌸', day: cd };
-  return { phase: 'default', color: 'transparent', icon: '', day: cd }; 
-}
-
-// ═══════════════════════════════════
-// QUESTS (V19 SORTING)
+// QUESTS (V20 Sub-subs & Custom Days)
 // ═══════════════════════════════════
 function renderSubPreview() { document.getElementById('subPreview').innerHTML = tempSubtasks.map((s,i) => `<div class="step-preview-item"><span>${s.text}</span><button onclick="tempSubtasks.splice(${i},1); renderSubPreview();" style="background:none;border:none;color:var(--danger);cursor:pointer;">✕</button></div>`).join(''); }
-function addSubtask(){ const inp = document.getElementById('hm-sub-input'); if(!inp.value.trim()) return; tempSubtasks.push({ id: Date.now(), text: inp.value.trim(), done: false }); inp.value = ''; renderSubPreview(); }
+function addSubtask(){ const inp = document.getElementById('hm-sub-input'); if(!inp.value.trim()) return; tempSubtasks.push({ id: Date.now(), text: inp.value.trim(), done: false, subs: [] }); inp.value = ''; renderSubPreview(); }
 
 function openHabitModal(hid = null) {
   const el = document.getElementById('hm-id');
   if(hid) {
-    const h = S.habits.find(x => x.id === hid);
-    if (!h) return;
+    const h = S.habits.find(x => x.id === hid); if (!h) return;
     document.getElementById('hm-modal-title').textContent = "Edit Quest";
     el.value = h.id; document.getElementById('hm-name').value = h.name; document.getElementById('hm-pts').value = h.pts; document.getElementById('hm-who').value = h.who; document.getElementById('hm-assigner').value = h.assignedBy || 'both'; document.getElementById('hm-freq').value = h.freq || 'none'; document.getElementById('hm-date').value = h.date || ''; document.getElementById('hm-time').value = h.time || ''; document.getElementById('hm-count').value = h.maxCount || 1; document.getElementById('hm-cd').value = h.cdMins || 0;
+    document.getElementById('hm-custom-days-sec').style.display = h.freq === 'custom' ? 'block' : 'none';
+    document.querySelectorAll('#hm-custom-days .pill').forEach(p => { p.classList.remove('active'); if (h.customDays && h.customDays.includes(parseInt(p.dataset.day))) p.classList.add('active'); });
     tempSubtasks = deepClone(h.subtasks || []);
   } else {
     document.getElementById('hm-modal-title').textContent = "New Quest";
-    el.value = ''; document.getElementById('hm-name').value = ''; document.getElementById('hm-pts').value = 20; document.getElementById('hm-date').value = ''; document.getElementById('hm-time').value = ''; document.getElementById('hm-count').value = 1; document.getElementById('hm-cd').value = 0; tempSubtasks = [];
+    el.value = ''; document.getElementById('hm-name').value = ''; document.getElementById('hm-pts').value = 20; document.getElementById('hm-date').value = ''; document.getElementById('hm-time').value = ''; document.getElementById('hm-count').value = 1; document.getElementById('hm-cd').value = 0; document.getElementById('hm-freq').value = 'none'; document.getElementById('hm-custom-days-sec').style.display = 'none'; document.querySelectorAll('#hm-custom-days .pill').forEach(p => p.classList.remove('active')); tempSubtasks = [];
   }
   renderSubPreview(); openModal('habitModal');
 }
@@ -610,21 +625,29 @@ function addHabit(){
   try {
     const name = document.getElementById('hm-name').value.trim(); const date = document.getElementById('hm-date').value; const time = document.getElementById('hm-time').value;
     if(!name) return;
-    const id = document.getElementById('hm-id').value;
-    const data = { name, assignedBy: document.getElementById('hm-assigner').value, freq: document.getElementById('hm-freq').value, pts: parseInt(document.getElementById('hm-pts').value)||20, who: document.getElementById('hm-who').value, subtasks: [...tempSubtasks], date: date || null, time: time || null, maxCount: parseInt(document.getElementById('hm-count').value)||1, cdMins: parseInt(document.getElementById('hm-cd').value)||0 };
+    const id = document.getElementById('hm-id').value; const freq = document.getElementById('hm-freq').value;
+    let customDays = []; if (freq === 'custom') { document.querySelectorAll('#hm-custom-days .pill.active').forEach(p => customDays.push(parseInt(p.dataset.day))); }
+    const data = { name, assignedBy: document.getElementById('hm-assigner').value, freq, customDays, pts: parseInt(document.getElementById('hm-pts').value)||20, who: document.getElementById('hm-who').value, subtasks: [...tempSubtasks], date: date || null, time: time || null, maxCount: parseInt(document.getElementById('hm-count').value)||1, cdMins: parseInt(document.getElementById('hm-cd').value)||0 };
     
     if(id) { const h = S.habits.find(x => x.id == id); if(h) Object.assign(h, data); toast('Quest Updated'); } 
     else { S.habits.push({ id: Date.now(), d1: 0, d2: 0, c1: 0, c2: 0, lastT1: 0, lastT2: 0, deletedAt: null, ...data }); if(date) S.events.push({ id: Date.now()+1, title: `Quest: ${name}`, date: date, time: time || null, who: data.who, color: '#d4a96a' }); toast('Quest Added 🎯'); }
     
     document.getElementById('hm-date').value=''; document.getElementById('hm-time').value=''; save(); closeModal('habitModal'); renderAll(); 
-  } catch(e) {
-    alert("Save Error: " + e.message);
-  }
+  } catch(e) { alert("Save Error: " + e.message); }
+}
+
+function addInlineSub(hid, parentSid) {
+  const inp = document.getElementById(`inline-sub-${hid}-${parentSid}`);
+  if (!inp || !inp.value.trim()) return;
+  const h = S.habits.find(x => x.id === hid); if(!h) return;
+  const s = h.subtasks.find(x => x.id === parentSid); if(!s) return;
+  if (!s.subs) s.subs = [];
+  s.subs.push({ id: Date.now(), text: inp.value.trim(), done: false });
+  inp.value = ''; save(); renderAll();
 }
 
 function makeQuestEl(h){
-  if (!h) return '';
-  if (h.deletedAt) return `<div class="deleted-quest">Deleted by ${h.who==='p1'?n1():n2()}</div>`;
+  if (!h) return ''; if (h.deletedAt) return `<div class="deleted-quest">Deleted by ${h.who==='p1'?n1():n2()}</div>`;
 
   const isCoop = h.who === 'both'; const showP1 = h.who !== 'p2'; const showP2 = h.who !== 'p1';
   const subsTotal = h.subtasks ? h.subtasks.length : 0; const subsDone = h.subtasks ? h.subtasks.filter(s => s.done).length : 0;
@@ -645,7 +668,6 @@ function makeQuestEl(h){
       else if (h.d1 === 2) actionsHtml += `<button class="chk-btn done" onclick="progressQuest(${h.id}, 1)">✓</button>`;
     }
   }
-  
   if (showP2) {
     if (hmax > 1) {
       if (h.d2 === 2) actionsHtml += `<button class="chk-btn done">✓</button>`;
@@ -676,14 +698,32 @@ function makeQuestEl(h){
           <button class="del-btn" onclick="deleteQuest(${h.id})">✕</button>
         </div>
       </div>
-      ${subsTotal > 0 ? `<div class="subtasks-container" id="qsub-${h.id}">${h.subtasks.map((s,i) => `<div class="sub-item"><div class="sub-chk ${s.done ? 'done' : ''}" onclick="toggleSub(${h.id}, ${s.id})">${s.done ? '✓' : ''}</div><span style="text-decoration: ${s.done ? 'line-through' : 'none'};">${s.text}</span></div>`).join('')}</div>` : ''}
+      ${subsTotal > 0 ? `<div class="subtasks-container" id="qsub-${h.id}">
+        ${h.subtasks.map((s) => `
+          <div class="sub-item">
+            <div class="sub-chk ${s.done ? 'done' : ''}" onclick="toggleSub(${h.id}, ${s.id})">${s.done ? '✓' : ''}</div>
+            <span style="text-decoration: ${s.done ? 'line-through' : 'none'};">${s.text}</span>
+          </div>
+          <div style="margin-left: 24px; margin-bottom:8px; display: ${s.done ? 'none' : 'block'}; border-left:1px solid var(--border); padding-left:8px;">
+            ${(s.subs || []).map((ss) => `
+                <div class="sub-item">
+                    <div class="sub-chk ${ss.done ? 'done' : ''}" onclick="toggleSubSub(${h.id}, ${s.id}, ${ss.id})">${ss.done ? '✓' : ''}</div>
+                    <span style="text-decoration: ${ss.done ? 'line-through' : 'none'}; font-size:0.7rem;">${ss.text}</span>
+                </div>
+            `).join('')}
+            <div class="step-input-row" style="margin-top:2px;">
+               <input type="text" id="inline-sub-${h.id}-${s.id}" placeholder="Sub-task..." style="padding:4px 8px; font-size:0.65rem;">
+               <button class="step-add-btn" style="padding:4px 8px; font-size:0.65rem;" onclick="addInlineSub(${h.id}, ${s.id})">Add</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>` : ''}
     </div>
   `;
 }
 
 function progressQuest(id, player) {
-  const h = S.habits.find(x => x.id === id); if(!h) return;
-  const nowMs = Date.now();
+  const h = S.habits.find(x => x.id === id); if(!h) return; const nowMs = Date.now();
   if(!h.c1) h.c1 = 0; if(!h.c2) h.c2 = 0;
   if(player === 1) {
     if (h.d1 !== 0) { h.d1 = 0; h.c1 = 0; save(); renderAll(); return; } 
@@ -706,6 +746,7 @@ function approveQuest(id, player) {
 
 function deleteQuest(id) { const h = S.habits.find(x => x.id === id); if(!h) return; h.deletedAt = Date.now(); save(); renderAll(); }
 function toggleSub(hid, sid) { const h = S.habits.find(x => x.id === hid); if(!h) return; const s = h.subtasks.find(x => x.id === sid); s.done = !s.done; save(); renderAll(); }
+function toggleSubSub(hid, sid, ssid) { const h = S.habits.find(x => x.id === hid); if(!h) return; const s = h.subtasks.find(x => x.id === sid); if(!s) return; const ss = (s.subs||[]).find(x => x.id === ssid); if(!ss) return; ss.done = !ss.done; save(); renderAll(); }
 
 function renderQuests(){
   document.getElementById('hdr-name1').textContent = n1(); document.getElementById('hdr-name2').textContent = n2();
@@ -713,7 +754,6 @@ function renderQuests(){
   cList.innerHTML=''; p1Today.innerHTML=''; p1Backlog.innerHTML=''; p2Today.innerHTML=''; p2Backlog.innerHTML='';
 
   let p1t=[], p1b=[], p2t=[], p2b=[], coop=[];
-  
   S.habits.forEach(h => {
     const isToday = h.freq !== 'none' || (h.date && h.date === todayISO) || h.deletedAt;
     if(h.who === 'both') { coop.push(h); }
@@ -721,20 +761,13 @@ function renderQuests(){
     else if(h.who === 'p2') { isToday ? p2t.push(h) : p2b.push(h); }
   });
   
-  // V19 Sorting Math: Active (0) -> Awaiting (1) -> Done (2) -> Deleted
   const sortFn = (p) => (a, b) => {
-    if (a.deletedAt && !b.deletedAt) return 1;
-    if (!a.deletedAt && b.deletedAt) return -1;
-    const statA = p===1 ? a.d1 : a.d2;
-    const statB = p===1 ? b.d1 : b.d2;
-    return statA - statB;
+    if (a.deletedAt && !b.deletedAt) return 1; if (!a.deletedAt && b.deletedAt) return -1;
+    const statA = p===1 ? a.d1 : a.d2; const statB = p===1 ? b.d1 : b.d2; return statA - statB;
   };
   const coopSort = (a, b) => {
-    if (a.deletedAt && !b.deletedAt) return 1;
-    if (!a.deletedAt && b.deletedAt) return -1;
-    const statA = Math.min(a.d1, a.d2);
-    const statB = Math.min(b.d1, b.d2);
-    return statA - statB;
+    if (a.deletedAt && !b.deletedAt) return 1; if (!a.deletedAt && b.deletedAt) return -1;
+    const statA = Math.min(a.d1, a.d2); const statB = Math.min(b.d1, b.d2); return statA - statB;
   };
 
   coop.sort(coopSort).forEach(h => cList.innerHTML += makeQuestEl(h));
@@ -749,20 +782,29 @@ function renderQuests(){
 }
 
 // ═══════════════════════════════════
-// EVENTS
+// EVENTS & TOGETHER WINDOWS
 // ═══════════════════════════════════
-function pickColor(el){ document.querySelectorAll('.color-opt').forEach(e=>e.classList.remove('sel')); el.classList.add('sel'); S.selectedColor = el.dataset.c; }
+let twColor = '#b09cda';
+function pickColor(el){ document.querySelectorAll('#colorOpts .color-opt').forEach(e=>e.classList.remove('sel')); el.classList.add('sel'); S.selectedColor = el.dataset.c; }
+function pickTwColor(el){ document.querySelectorAll('#twColorOpts .color-opt').forEach(e=>e.classList.remove('sel')); el.classList.add('sel'); twColor = el.dataset.c; }
+
+function addTogetherWindow() {
+  const start = document.getElementById('tw-start').value; const end = document.getElementById('tw-end').value; const label = document.getElementById('tw-label').value.trim();
+  if(!start || !end || start > end) { toast('Invalid dates!'); return; }
+  S.togetherWindows.push({ id: Date.now(), start, end, label, color: twColor });
+  save(); closeModal('togetherModal'); renderCalendar(); renderEventList(); toast('Together Window created!');
+}
 
 function openEventModal(eid = null) {
   const el = document.getElementById('em-id');
   if(eid) {
-    const ev = S.events.find(x => x.id === eid);
-    document.getElementById('em-modal-title').textContent = "Edit Event";
-    el.value = ev.id; document.getElementById('em-title').value = ev.title; document.getElementById('em-date').value = ev.date; document.getElementById('em-time').value = ev.time || ''; document.getElementById('em-end').value = ev.end || ''; document.getElementById('em-who').value = ev.who; document.getElementById('em-intimacy').checked = ev.isIntimacy || false;
-    const swatch = document.querySelector(`.color-opt[data-c="${ev.color}"]`); if(swatch) pickColor(swatch);
+    const ev = S.events.find(x => x.id === eid); if(!ev) return;
+    document.getElementById('em-modal-title').textContent = "Edit Event"; el.value = ev.id; document.getElementById('em-title').value = ev.title; document.getElementById('em-date').value = ev.date; document.getElementById('em-time').value = ev.time || ''; document.getElementById('em-end').value = ev.end || ''; document.getElementById('em-who').value = ev.who; document.getElementById('em-intimacy').checked = ev.isIntimacy || false; document.getElementById('em-intimacy-section').style.display = ev.isIntimacy ? 'block' : 'none';
+    document.querySelectorAll('#em-intimacy-acts .pill').forEach(p => { p.classList.remove('active'); if(ev.intimacyActs && ev.intimacyActs.includes(p.dataset.val)) p.classList.add('active'); });
+    if (ev.isIntimacy) { document.getElementById('em-intimacy-type').value = ev.intimacyType || 'spontaneous'; document.getElementById('em-intimacy-pts').value = ev.intimacyPts || 50; document.getElementById('em-intimacy-who').value = ev.intimacyWho || 'p1'; document.getElementById('em-intimacy-deferred').checked = ev.intimacyDeferred !== false; document.getElementById('em-intimacy-pts-sec').style.display = (ev.intimacyType==='reward'||ev.intimacyType==='punishment')?'grid':'none'; }
+    const swatch = document.querySelector(`#colorOpts .color-opt[data-c="${ev.color}"]`); if(swatch) pickColor(swatch);
   } else {
-    document.getElementById('em-modal-title').textContent = "New Event";
-    el.value = ''; document.getElementById('em-title').value = ''; document.getElementById('em-date').value = selDate; document.getElementById('em-time').value = '19:00'; document.getElementById('em-end').value = ''; document.getElementById('em-intimacy').checked = false;
+    document.getElementById('em-modal-title').textContent = "New Event"; el.value = ''; document.getElementById('em-title').value = ''; document.getElementById('em-date').value = selDate; document.getElementById('em-time').value = '19:00'; document.getElementById('em-end').value = ''; document.getElementById('em-intimacy').checked = false; document.getElementById('em-intimacy-section').style.display = 'none'; document.querySelectorAll('#em-intimacy-acts .pill').forEach(p => p.classList.remove('active'));
   }
   openModal('eventModal');
 }
@@ -770,9 +812,25 @@ function openEventModal(eid = null) {
 function addEvent(){
   const title = document.getElementById('em-title').value.trim(); const date = document.getElementById('em-date').value; const time = document.getElementById('em-time').value; const end = document.getElementById('em-end').value; const who = document.getElementById('em-who').value; const isIntimacy = document.getElementById('em-intimacy').checked;
   if(!title||!date) return; const id = document.getElementById('em-id').value;
-  if(id) { const ev = S.events.find(x => x.id == id); if(ev) { ev.title = title; ev.date = date; ev.time = time || null; ev.end = end; ev.who = who; ev.color = S.selectedColor; ev.isIntimacy = isIntimacy; } toast('Event Updated 📅'); } 
-  else { S.events.push({ id: Date.now(), title, date, time: time || null, end, who, color: S.selectedColor, isIntimacy }); toast('Event Added 📅'); }
+  
+  let acts = []; document.querySelectorAll('#em-intimacy-acts .pill.active').forEach(p => acts.push(p.dataset.val));
+  const iType = document.getElementById('em-intimacy-type').value; const iPts = parseInt(document.getElementById('em-intimacy-pts').value)||0; const iWho = document.getElementById('em-intimacy-who').value; const iDef = document.getElementById('em-intimacy-deferred').checked;
+  
+  let baseEv = { title, date, time: time || null, end, who, color: S.selectedColor, isIntimacy, intimacyActs: acts, intimacyType: iType, intimacyPts: iPts, intimacyWho: iWho, intimacyDeferred: iDef };
+  
+  if(id) { const ev = S.events.find(x => x.id == id); if(ev) Object.assign(ev, baseEv); toast('Event Updated'); } 
+  else { 
+    baseEv.id = Date.now(); baseEv.isCompleted = false; S.events.push(baseEv); toast('Event Added'); 
+    if (isIntimacy && !iDef && !baseEv.isCompleted && (iType === 'reward' || iType === 'punishment')) { processIntimacyPoints(baseEv.id, true); }
+  }
   document.getElementById('em-id').value=''; document.getElementById('em-title').value=''; save(); closeModal('eventModal'); renderCalendar(); renderEventList(); 
+}
+
+function processIntimacyPoints(eid, silent = false) {
+  const ev = S.events.find(x => x.id === eid); if(!ev || ev.isCompleted) return;
+  if (ev.intimacyType === 'reward') { if(ev.intimacyWho === 'p1') S.pts1 += ev.intimacyPts; else S.pts2 += ev.intimacyPts; }
+  else if (ev.intimacyType === 'punishment') { if(ev.intimacyWho === 'p1') S.pts1 -= ev.intimacyPts; else S.pts2 -= ev.intimacyPts; }
+  ev.isCompleted = true; save(); renderAll(); if(!silent) toast('Intimacy points applied! 🤎');
 }
 
 let calYear = now.getFullYear(), calMonth2 = now.getMonth();
@@ -799,15 +857,26 @@ function renderCalendar(){
   }
 
   if (viewMode === 'month' || viewMode === 'week') {
-    cells.forEach(c=>{
+    cells.forEach((c, index) => {
       const dateStr = `${c.year}-${String(c.month+1).padStart(2,'0')}-${String(c.d).padStart(2,'0')}`;
       const cycleData = getCyclePhase(dateStr); const logData = S.cycle.dailyLogs[dateStr]; 
       const eventsOnDay = S.events.filter(e => e.date === dateStr).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+      
       const cell = document.createElement('div'); cell.className='cal-cell'+(c.other?' other-month':'')+(dateStr===todayISO?' today':'')+(dateStr===selDate?' selected':'');
       if(cycleData && cycleData.phase !== 'default') cell.style.backgroundColor = cycleData.color;
+      
+      let twHtml = '';
+      const tw = S.togetherWindows.find(w => dateStr >= w.start && dateStr <= w.end);
+      if (tw) {
+        cell.style.backgroundColor = hexToRgba(tw.color, 0.25);
+        if (dateStr === tw.start || index === 0 || (viewMode === 'month' && c.d === 1)) {
+          if (tw.label) twHtml = `<div class="tw-banner" style="background:${hexToRgba(tw.color, 0.6)};">${tw.label}</div>`;
+        }
+      }
+
       let iconsHtml = ''; if(cycleData && cycleData.icon) iconsHtml += `<span>${cycleData.icon}</span>`; if(logData && logData.sex && logData.sex.length > 0) iconsHtml += `<span>🤍</span>`;
       const eventBarsHtml = eventsOnDay.map(e => viewMode === 'week' ? `<div class="cal-bar-text" style="background:${e.color};">${e.isIntimacy?'🤍 ':''}${e.title}</div>` : `<div class="cal-bar" style="background:${e.color};"></div>`).join('');
-      cell.innerHTML=`<div class="cal-log-icons">${iconsHtml}</div><span class="cal-num">${c.d}</span><div class="cal-bars">${eventBarsHtml}</div>`;
+      cell.innerHTML=`${twHtml}<div class="cal-log-icons">${iconsHtml}</div><span class="cal-num" style="z-index:2; margin-top:${twHtml?'10px':'0'};">${c.d}</span><div class="cal-bars">${eventBarsHtml}</div>`;
       cell.addEventListener('click', () => { selDate = dateStr; viewMode = 'day'; renderCalendar(); renderEventList(); }); grid.appendChild(cell);
     });
   } else if (viewMode === 'day') {
@@ -816,7 +885,7 @@ function renderCalendar(){
     let loggedItemsHtml = '';
     if (log) {
         if(log.flow) loggedItemsHtml += `<span style="background:rgba(224, 120, 120, 0.2); color:#e07878; padding:3px 8px; border-radius:12px; font-size:0.7rem; margin:2px;">🩸 ${log.flow} flow</span>`;
-        if(log.sex && log.sex.length > 0) loggedItemsHtml += `<span style="background:rgba(176, 156, 218, 0.2); color:var(--shared); padding:3px 8px; border-radius:12px; font-size:0.7rem; margin:2px;">🤍 Intimacy: ${log.sex.join(', ')}</span>`;
+        if(log.sex && log.sex.length > 0) loggedItemsHtml += `<span style="background:rgba(176, 156, 218, 0.2); color:var(--shared); padding:3px 8px; border-radius:12px; font-size:0.7rem; margin:2px;">🤍 Log: ${log.sex.join(', ')}</span>`;
         if(log.bbt) loggedItemsHtml += `<span style="background:var(--card2); color:var(--muted); padding:3px 8px; border-radius:12px; font-size:0.7rem; margin:2px;">🌡️ ${log.bbt}°</span>`;
         if(log.symp && log.symp.length > 0) loggedItemsHtml += `<div style="font-size:0.75rem; color:var(--muted); margin-top:8px;">Symptoms: ${log.symp.join(', ')}</div>`;
     }
@@ -824,12 +893,16 @@ function renderCalendar(){
   }
 }
 
-function toggleMed(dateStr, player) { if(!S.medsCheck[dateStr]) S.medsCheck[dateStr] = {p1:false, p2:false}; S.medsCheck[dateStr][player] = !S.medsCheck[dateStr][player]; save(); renderEventList(); }
-
 function makeEventEl(ev, compact){
   const whoLabel = ev.who==='both'?`${n1()} & ${n2()}`:ev.who==='p1'?n1():n2();
   const d = document.createElement('div'); d.className='event-item'; d.style.borderLeftColor=ev.color;
-  d.innerHTML=`<div class="ev-time">${fmt12(ev.time)}</div><div class="ev-body"><div class="ev-title">${ev.isIntimacy?'🤍 ':''}${ev.title}</div><div class="ev-who">${whoLabel} ${ev.end?' until '+fmt12(ev.end):''}</div></div>${!compact?`<button class="edit-btn" onclick="openEventModal(${ev.id})">✎</button><button class="del-btn" onclick="S.events=S.events.filter(x=>x.id!==${ev.id}); save(); renderCalendar(); renderEventList();">✕</button>`:''}`;
+  
+  let completionHtml = '';
+  if (!compact && ev.isIntimacy && ev.intimacyDeferred && !ev.isCompleted && (ev.intimacyType === 'reward' || ev.intimacyType === 'punishment')) {
+      completionHtml = `<button class="approve-btn" style="margin-right:6px;" onclick="processIntimacyPoints(${ev.id})">Complete</button>`;
+  }
+
+  d.innerHTML=`<div class="ev-time">${fmt12(ev.time)}</div><div class="ev-body"><div class="ev-title">${ev.isIntimacy?'🤍 ':''}${ev.title} ${ev.isCompleted?'<span style="font-size:0.6rem;color:var(--success);">✓</span>':''}</div><div class="ev-who">${whoLabel} ${ev.end?' until '+fmt12(ev.end):''}</div></div>${completionHtml}${!compact?`<button class="edit-btn" onclick="openEventModal(${ev.id})">✎</button><button class="del-btn" onclick="S.events=S.events.filter(x=>x.id!==${ev.id}); save(); renderCalendar(); renderEventList();">✕</button>`:''}`;
   return d;
 }
 
@@ -840,13 +913,19 @@ function renderEventList(){
     const targetDow = new Date(selDate + 'T12:00:00').getDay(); const w1 = P1_WORK[targetDow], w2 = P2_WORK[targetDow];
     if(!S.medsCheck[selDate]) S.medsCheck[selDate] = {p1:false, p2:false};
     
+    // Together Windows Inject
+    const activeTw = S.togetherWindows.filter(w => selDate >= w.start && selDate <= w.end);
+    
     if (viewMode === 'day') {
       el.innerHTML=`<div class="event-day-header">Daily Schedule</div>`;
+      activeTw.forEach(tw => {
+          el.innerHTML += `<div class="event-item tw-block" style="border-left-color:${tw.color};"><div class="ev-time" style="font-size:1rem;">🤎</div><div class="ev-body"><div class="ev-title" style="color:${tw.color};">Together Window</div><div class="ev-who">${tw.label || 'Shared Time'}</div></div><button class="del-btn" onclick="S.togetherWindows=S.togetherWindows.filter(x=>x.id!==${tw.id}); save(); renderCalendar(); renderEventList();">✕</button></div>`;
+      });
       if(w1) el.innerHTML+= `<div class="med-item"><button class="med-check ${S.medsCheck[selDate].p1?'done':''}" onclick="toggleMed('${selDate}','p1')">✓</button><div class="med-text ${S.medsCheck[selDate].p1?'done':''}">${fmt12(w1.start)} - ${n1()}'s Meds</div></div>`;
       if(w2) el.innerHTML+= `<div class="med-item"><button class="med-check ${S.medsCheck[selDate].p2?'done':''}" onclick="toggleMed('${selDate}','p2')">✓</button><div class="med-text ${S.medsCheck[selDate].p2?'done':''}">${fmt12(w2.start)} - ${n2()}'s Meds</div></div>`;
     } else { el.innerHTML=`<div class="event-day-header">${selDate===todayISO ? 'Today' : new Date(selDate+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</div>`; }
     
-    if(!selEvents.length && !w1 && !w2 && viewMode === 'day') el.innerHTML+=`<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No events scheduled</div>`;
+    if(!selEvents.length && !w1 && !w2 && activeTw.length === 0 && viewMode === 'day') el.innerHTML+=`<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No events scheduled</div>`;
     else if(!selEvents.length && viewMode !== 'day') el.innerHTML+=`<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No events scheduled</div>`;
     selEvents.forEach(ev=>el.appendChild(makeEventEl(ev)));
 
@@ -854,10 +933,7 @@ function renderEventList(){
     const todayEvents = S.events.filter(e=>e.date===todayISO).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
     if(!todayEvents.length) dash.innerHTML='<div style="color:var(--muted);font-size:0.8rem">Nothing scheduled today</div>';
     else todayEvents.forEach(ev=>dash.appendChild(makeEventEl(ev,true)));
-  } catch(e) {
-    console.error("Event Render Crash: ", e);
-    document.getElementById('eventList').innerHTML = `<div style="color:var(--danger); padding:10px; font-size:0.7rem;">Crash rendering events: ${e.message}</div>`;
-  }
+  } catch(e) { console.error("Event Render Crash: ", e); document.getElementById('eventList').innerHTML = `<div style="color:var(--danger); padding:10px; font-size:0.7rem;">Crash rendering events: ${e.message}</div>`; }
 }
 
 // ═══════════════════════════════════
@@ -866,29 +942,23 @@ function renderEventList(){
 function addReward(){ const name=document.getElementById('rm-name').value.trim(); if(!name) return; S.rewards.push({ id: Date.now(), name, icon: document.getElementById('rm-icon').value||'🎁', cost: parseInt(document.getElementById('rm-cost').value)||50 }); document.getElementById('rm-name').value=''; save(); closeModal('rewardModal'); renderRewards(); toast('Item added to Exchange 🗝️'); }
 
 function buyReward(id, buyer) {
-    const r = S.rewards.find(x => x.id === id);
+    const r = S.rewards.find(x => x.id === id); if(!r) return;
     if (buyer === 1) {
         if (S.pts1 < r.cost) return toast('Not enough points! ❌');
-        S.pts1 -= r.cost;
-        S.habits.push({ id: Date.now(), name: 'Tribute: ' + r.name, assignedBy: 'p1', freq: 'none', pts: 0, who: 'p2', d1: 0, d2: 0, c1: 0, c2: 0, lastT1: 0, lastT2: 0, subtasks: [], deletedAt: null });
-        toast(`Claimed! Demand sent to ${n2()} 🗝️`);
+        S.pts1 -= r.cost; S.habits.push({ id: Date.now(), name: 'Tribute: ' + r.name, assignedBy: 'p1', freq: 'none', pts: 0, who: 'p2', d1: 0, d2: 0, c1: 0, c2: 0, lastT1: 0, lastT2: 0, subtasks: [], deletedAt: null }); toast(`Claimed! Demand sent to ${n2()} 🗝️`);
     } else {
         if (S.pts2 < r.cost) return toast('Not enough points! ❌');
-        S.pts2 -= r.cost;
-        S.habits.push({ id: Date.now(), name: 'Tribute: ' + r.name, assignedBy: 'p2', freq: 'none', pts: 0, who: 'p1', d1: 0, d2: 0, c1: 0, c2: 0, lastT1: 0, lastT2: 0, subtasks: [], deletedAt: null });
-        toast(`Claimed! Demand sent to ${n1()} 🗝️`);
+        S.pts2 -= r.cost; S.habits.push({ id: Date.now(), name: 'Tribute: ' + r.name, assignedBy: 'p2', freq: 'none', pts: 0, who: 'p1', d1: 0, d2: 0, c1: 0, c2: 0, lastT1: 0, lastT2: 0, subtasks: [], deletedAt: null }); toast(`Claimed! Demand sent to ${n1()} 🗝️`);
     }
     save(); renderAll();
 }
 
 function offerTribute(id, offerer) {
-    const r = S.rewards.find(x => x.id === id);
+    const r = S.rewards.find(x => x.id === id); if(!r) return;
     if (offerer === 1) {
-        S.habits.push({ id: Date.now(), name: 'Offer: ' + r.name, assignedBy: 'p1', freq: 'none', pts: r.cost, who: 'p1', d1: 0, d2: 0, c1: 0, c2: 0, lastT1: 0, lastT2: 0, subtasks: [], deletedAt: null });
-        toast(`Tribute offered! Awaiting approval. 🗝️`);
+        S.habits.push({ id: Date.now(), name: 'Offer: ' + r.name, assignedBy: 'p1', freq: 'none', pts: r.cost, who: 'p1', d1: 0, d2: 0, c1: 0, c2: 0, lastT1: 0, lastT2: 0, subtasks: [], deletedAt: null }); toast(`Tribute offered! Awaiting approval. 🗝️`);
     } else {
-        S.habits.push({ id: Date.now(), name: 'Offer: ' + r.name, assignedBy: 'p2', freq: 'none', pts: r.cost, who: 'p2', d1: 0, d2: 0, c1: 0, c2: 0, lastT1: 0, lastT2: 0, subtasks: [], deletedAt: null });
-        toast(`Tribute offered! Awaiting approval. 🗝️`);
+        S.habits.push({ id: Date.now(), name: 'Offer: ' + r.name, assignedBy: 'p2', freq: 'none', pts: r.cost, who: 'p2', d1: 0, d2: 0, c1: 0, c2: 0, lastT1: 0, lastT2: 0, subtasks: [], deletedAt: null }); toast(`Tribute offered! Awaiting approval. 🗝️`);
     }
     save(); renderAll();
 }
@@ -896,9 +966,7 @@ function offerTribute(id, offerer) {
 function renderRewards(){
   const grid = document.getElementById('rewardsGrid'); grid.innerHTML='';
   S.rewards.forEach(r=>{
-    const p1CanAfford = S.pts1 >= r.cost;
-    const p2CanAfford = S.pts2 >= r.cost;
-    
+    const p1CanAfford = S.pts1 >= r.cost; const p2CanAfford = S.pts2 >= r.cost;
     const card=document.createElement('div'); card.className='reward-card';
     card.innerHTML=`
       <button class="rdel" onclick="S.rewards = S.rewards.filter(x=>x.id!==${r.id}); save(); renderRewards();">✕</button>
@@ -906,14 +974,8 @@ function renderRewards(){
       <div class="rbody">
         <div class="rname">${r.name}</div>
         <div class="rcost">Value: ${r.cost} pts</div>
-        <div class="raction-row">
-            <button class="ex-btn btn-claim ${p1CanAfford?'':'disabled'}" onclick="${p1CanAfford ? `buyReward(${r.id}, 1)` : ''}" title="Rebecca spends points to demand this">R: Claim</button>
-            <button class="ex-btn btn-offer" onclick="offerTribute(${r.id}, 1)" title="Rebecca performs this to earn points">R: Offer</button>
-        </div>
-        <div class="raction-row" style="margin-top:6px;">
-            <button class="ex-btn btn-claim ${p2CanAfford?'':'disabled'}" onclick="${p2CanAfford ? `buyReward(${r.id}, 2)` : ''}" title="Marius spends points to demand this">M: Claim</button>
-            <button class="ex-btn btn-offer" onclick="offerTribute(${r.id}, 2)" title="Marius performs this to earn points">M: Offer</button>
-        </div>
+        <div class="raction-row"><button class="ex-btn btn-claim ${p1CanAfford?'':'disabled'}" onclick="${p1CanAfford ? `buyReward(${r.id}, 1)` : ''}" title="Rebecca spends points to demand this">R: Claim</button><button class="ex-btn btn-offer" onclick="offerTribute(${r.id}, 1)" title="Rebecca performs this to earn points">R: Offer</button></div>
+        <div class="raction-row" style="margin-top:6px;"><button class="ex-btn btn-claim ${p2CanAfford?'':'disabled'}" onclick="${p2CanAfford ? `buyReward(${r.id}, 2)` : ''}" title="Marius spends points to demand this">M: Claim</button><button class="ex-btn btn-offer" onclick="offerTribute(${r.id}, 2)" title="Marius performs this to earn points">M: Offer</button></div>
       </div>
     `;
     grid.appendChild(card);
@@ -921,29 +983,77 @@ function renderRewards(){
 }
 
 // ═══════════════════════════════════
-// WHITEBOARD
+// WHITEBOARD (V20 Upgrades)
 // ═══════════════════════════════════
 const canvas = document.getElementById('whiteboard'); const ctx = canvas.getContext('2d'); 
-let isDrawing = false; let boardColor = '#0d0c0f'; let boardSaveTimeout;
+let isDrawing = false; let boardColor = '#0d0c0f'; let activeTool = 'pen'; let boardSaveTimeout; let boardHistory = [];
 
-function initBoard() { if (S.boardImage) { const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0); img.src = S.boardImage; } }
-function startDraw(e) { isDrawing = true; draw(e); }
+function initBoard() { if (S.boardImage) { const img = new Image(); img.onload = () => { ctx.drawImage(img, 0, 0); saveBoardState(); }; img.src = S.boardImage; } else { saveBoardState(); } }
+
+function setBoardTool(t) {
+  activeTool = t; document.getElementById('btnToolPen').classList.remove('active'); document.getElementById('btnToolFill').classList.remove('active');
+  if(t==='pen') document.getElementById('btnToolPen').classList.add('active'); if(t==='fill') document.getElementById('btnToolFill').classList.add('active');
+}
+
+function saveBoardState() {
+  boardHistory.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  if (boardHistory.length > 30) boardHistory.shift();
+}
+
+function undoBoard() {
+  if (boardHistory.length > 1) {
+    boardHistory.pop(); ctx.putImageData(boardHistory[boardHistory.length - 1], 0, 0); S.boardImage = canvas.toDataURL(); save();
+  } else if (boardHistory.length === 1) {
+    ctx.clearRect(0,0,canvas.width,canvas.height); boardHistory = []; saveBoardState(); S.boardImage = ''; save();
+  }
+}
+
+function floodFill(startX, startY, hexColor) {
+  startX = Math.floor(startX); startY = Math.floor(startY);
+  const r = parseInt(hexColor.slice(1,3), 16), g = parseInt(hexColor.slice(3,5), 16), b = parseInt(hexColor.slice(5,7), 16);
+  const w = canvas.width, h = canvas.height; const imgData = ctx.getImageData(0,0,w,h); const data = imgData.data;
+  const startIdx = (startY * w + startX) * 4;
+  const sr = data[startIdx], sg = data[startIdx+1], sb = data[startIdx+2], sa = data[startIdx+3];
+
+  if (Math.abs(sr-r)<=30 && Math.abs(sg-g)<=30 && Math.abs(sb-b)<=30) { toast('Area is already this color! 🪣'); return; }
+  
+  const q = [[startX, startY]]; const seen = new Uint8Array(w * h); seen[startY * w + startX] = 1;
+  while(q.length > 0) {
+      const [cx, cy] = q.pop(); const idx = (cy * w + cx) * 4;
+      if (Math.abs(data[idx]-sr)>30 || Math.abs(data[idx+1]-sg)>30 || Math.abs(data[idx+2]-sb)>30) continue; 
+      data[idx] = r; data[idx+1] = g; data[idx+2] = b; data[idx+3] = 255;
+      if (cx > 0 && !seen[cy*w+cx-1]) { q.push([cx-1, cy]); seen[cy*w+cx-1] = 1; }
+      if (cx < w-1 && !seen[cy*w+cx+1]) { q.push([cx+1, cy]); seen[cy*w+cx+1] = 1; }
+      if (cy > 0 && !seen[(cy-1)*w+cx]) { q.push([cx, cy-1]); seen[(cy-1)*w+cx] = 1; }
+      if (cy < h-1 && !seen[(cy+1)*w+cx]) { q.push([cx, cy+1]); seen[(cy+1)*w+cx] = 1; }
+  }
+  ctx.putImageData(imgData, 0, 0); S.boardImage = canvas.toDataURL(); save();
+}
+
+function startDraw(e) { 
+  e.preventDefault(); const rect = canvas.getBoundingClientRect(); const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; 
+  const x = (clientX - rect.left) * (canvas.width / rect.width); const y = (clientY - rect.top) * (canvas.height / rect.height); 
+  
+  saveBoardState(); // Capture for undo BEFORE action
+  
+  if (activeTool === 'fill') { floodFill(x, y, boardColor); return; }
+  isDrawing = true; draw(e); 
+}
 function draw(e) { 
   if (!isDrawing) return; e.preventDefault(); 
   const rect = canvas.getBoundingClientRect(); const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; 
   const x = (clientX - rect.left) * (canvas.width / rect.width); const y = (clientY - rect.top) * (canvas.height / rect.height); 
-  ctx.lineWidth = boardColor === '#ffffff' ? 12 : 3; 
+  ctx.lineWidth = boardColor === '#ffffff' ? 14 : 3; 
   ctx.lineCap = 'round'; ctx.strokeStyle = boardColor; ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y); 
 }
 function endDraw() { 
-  isDrawing = false; ctx.beginPath(); 
-  clearTimeout(boardSaveTimeout);
+  if(!isDrawing) return; isDrawing = false; ctx.beginPath(); clearTimeout(boardSaveTimeout);
   boardSaveTimeout = setTimeout(() => { S.boardImage = canvas.toDataURL(); save(); }, 1500);
 }
 canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', endDraw);
 canvas.addEventListener('touchstart', startDraw, {passive:false}); canvas.addEventListener('touchmove', draw, {passive:false}); canvas.addEventListener('touchend', endDraw);
-document.querySelectorAll('.pen-color').forEach(el => { el.addEventListener('click', () => { document.querySelectorAll('.pen-color').forEach(e => e.classList.remove('sel')); el.classList.add('sel'); boardColor = el.dataset.c; }); });
-function clearBoard() { ctx.clearRect(0, 0, canvas.width, canvas.height); S.boardImage = ''; save(); }
+document.querySelectorAll('.pen-color').forEach(el => { el.addEventListener('click', () => { document.querySelectorAll('.pen-color').forEach(e => e.classList.remove('sel')); el.classList.add('sel'); boardColor = el.dataset.c; setBoardTool('pen'); }); });
+function clearBoard() { saveBoardState(); ctx.clearRect(0, 0, canvas.width, canvas.height); S.boardImage = ''; save(); }
 function saveBoardText() { S.boardText = document.getElementById('boardText').value; save(); }
 
 // ═══════════════════════════════════
@@ -966,30 +1076,22 @@ function updateStats(){
       if(document.getElementById('pct2')) document.getElementById('pct2').textContent = pct2+'%'; 
     }
     
-    if(p1El) p1El.textContent = S.pts1; 
-    if(p2El) p2El.textContent = S.pts2;
+    if(p1El) p1El.textContent = S.pts1; if(p2El) p2El.textContent = S.pts2;
     
     const bar1 = document.getElementById('barp1');
-    if(bar1) {
-      const t = Math.abs(S.pts1)+Math.abs(S.pts2)||1; 
-      bar1.style.width = Math.round(Math.abs(S.pts1)/t*100)+'%';
-    }
+    if(bar1) { const t = Math.abs(S.pts1)+Math.abs(S.pts2)||1; bar1.style.width = Math.round(Math.abs(S.pts1)/t*100)+'%'; }
     
     const dashNotifs = document.getElementById('dashNotifs');
     if(dashNotifs) {
       dashNotifs.innerHTML = '';
       const p1Awaiting = S.habits.filter(h => (h.who==='p1' || h.who==='both') && h.d1 === 1 && !h.deletedAt).length;
       const p2Awaiting = S.habits.filter(h => (h.who==='p2' || h.who==='both') && h.d2 === 1 && !h.deletedAt).length;
-      
       let notifHtml = '';
       if(p1Awaiting > 0) notifHtml += `<div class="app-alert"><span>⏳</span> <div>${n1()} has ${p1Awaiting} quest(s) awaiting approval!</div></div>`;
       if(p2Awaiting > 0) notifHtml += `<div class="app-alert"><span>⏳</span> <div>${n2()} has ${p2Awaiting} quest(s) awaiting approval!</div></div>`;
       dashNotifs.innerHTML = notifHtml;
     }
-    
-  } catch (e) {
-    console.error("Stat render error ignored: " + e.message);
-  }
+  } catch (e) { console.error("Stat render error ignored: " + e.message); }
 }
 function renderAll(){ updateStats(); renderWorkStrip(); renderQuests(); renderRewards(); renderEventList(); }
 document.getElementById('name1').addEventListener('change',save); document.getElementById('name2').addEventListener('change',save);
