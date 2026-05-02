@@ -70,7 +70,7 @@ section.active { display:block; }
 .ppts.debt { color:var(--danger) !important; text-shadow: 0 0 8px rgba(224,120,120,0.5); }
 .ppts-lbl { font-size:0.6rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:2px; }
 .shared-card { background:var(--card); border-radius:var(--radius); padding:14px; border:1px solid var(--border); margin-bottom:14px; }
-.shared-lbl { display:flex; justify-content:space-between; font-size:0.7rem; color:var(--muted); margin-bottom:8px; }
+.shared-lbl { display:flex; justify-content:space-between; font-size:0.7rem; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
 .shared-bar { height:7px; background:var(--border); border-radius:4px; overflow:hidden; position:relative; }
 .sbar-p1 { position:absolute; left:0; top:0; height:100%; background:var(--p1); border-radius:4px; transition:width 0.6s ease; }
 .sbar-p2 { position:absolute; right:0; top:0; height:100%; background:var(--p2); border-radius:4px; transition:width 0.6s ease; }
@@ -127,11 +127,12 @@ section.active { display:block; }
 .cal-legend div { display:flex; align-items:center; gap:4px; }
 
 .day-view-header { text-align:center; padding: 15px 0 5px; position:relative; }
-.day-view-back { position:absolute; left:0; top:15px; background:var(--card2); border:1px solid var(--border2); color:var(--muted); padding:6px 12px; border-radius:8px; font-family:var(--font-b); font-size:0.7rem; cursor:pointer; }
+.day-view-back { position:absolute; left:0; top:15px; background:var(--card2); border:1px solid var(--border2); color:var(--muted); padding:6px 12px; border-radius:8px; font-family:var(--font-b); font-size:0.7rem; cursor:pointer; z-index:10; }
 .event-day-header { font-size:0.68rem; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin:14px 0 7px; display:flex; align-items:center; gap:8px; }
 .event-day-header::after { content:''; flex:1; height:1px; background:var(--border); }
 .event-item { background:var(--card); border-radius:var(--radius-sm); padding:11px 12px; margin-bottom:6px; display:flex; align-items:center; gap:10px; border:1px solid var(--border); border-left:3px solid; }
 .event-item.tw-block { border-style:dashed; border-color:var(--border2); }
+.event-item.ov-block { border-style:dashed; border-color:var(--warning); background:rgba(224,184,120,0.05); }
 .ev-time { font-size:0.7rem; color:var(--muted); width:42px; flex-shrink:0; text-align:center; }
 .ev-body { flex:1; }
 .ev-title { font-size:0.85rem; font-weight:500; }
@@ -192,7 +193,7 @@ section.active { display:block; }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 .view-sel { background:none; border:none; color:var(--muted); font-size:0.7rem; font-family:var(--font-b); text-transform:uppercase; letter-spacing:1px; outline:none; text-align:center; padding: 2px; }
 .pill-opts { display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
-.pill { background:var(--card2); border:1px solid var(--border2); color:var(--muted2); padding:6px 12px; border-radius:20px; font-size:0.75rem; cursor:pointer; transition:all 0.2s; }
+.pill { background:var(--card2); border:1px solid var(--border2); color:var(--muted2); padding:6px 12px; border-radius:20px; font-size:0.75rem; cursor:pointer; transition:all 0.2s; user-select:none; }
 .pill.active { background:var(--sharedbg); border-color:var(--shared); color:var(--shared); }
 </style>
 </head>
@@ -200,7 +201,7 @@ section.active { display:block; }
 <div class="app">
 
 <header>
-  <div style="position:absolute; top:12px; right:14px; font-size:0.6rem; color:var(--muted2); font-family:monospace; font-weight:600;">v22</div>
+  <div style="position:absolute; top:12px; right:14px; font-size:0.6rem; color:var(--muted2); font-family:monospace; font-weight:600;">v23</div>
   <div class="logo">us <span>🤎</span></div>
   <div class="hdate" id="hdate"></div>
   <div class="streak">🔥 <span id="streakN">0</span> day streak</div>
@@ -227,9 +228,24 @@ section.active { display:block; }
     <div class="shared-bar"><div class="sbar-p1" id="barp1"></div><div class="sbar-p2" id="barp2"></div></div>
   </div>
   
+  <div id="dashCountdown" class="shared-card" style="display:none; text-align:center; padding:18px 14px; background:linear-gradient(145deg, var(--card), rgba(176,156,218,0.05)); border-color:rgba(176,156,218,0.3);">
+    <div class="shared-lbl" style="justify-content:center; margin-bottom:12px;"><span>Next Together</span></div>
+    <div id="cd-text" style="font-family:var(--font-d); font-size:1.4rem; color:var(--shared); line-height:1.2;"></div>
+  </div>
+  
   <div class="sec-head"><div class="sec-title">Work Week</div></div>
   <div class="work-strip" id="workStrip"></div>
   <div id="dashNotifs" style="margin-bottom:18px;"></div>
+  
+  <div class="sec-head" style="margin-top:20px;"><div class="sec-title">Tonight 🤎</div></div>
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px;">
+     <div style="display:flex; justify-content:center; gap:30px; margin-bottom:14px;">
+        <div class="o-btn" oncontextmenu="return false" onmousedown="oDown(1, event)" onmouseup="oUp(1, event)" onmouseleave="oCancel(1)" ontouchstart="oDown(1, event)" ontouchend="oUp(1, event)" style="font-size:1.4rem; cursor:pointer; user-select:none;">🤎 <span id="o-p1" style="font-family:var(--font-b); font-weight:600; font-size:1rem; margin-left:4px;">0</span></div>
+        <div class="o-btn" oncontextmenu="return false" onmousedown="oDown(2, event)" onmouseup="oUp(2, event)" onmouseleave="oCancel(2)" ontouchstart="oDown(2, event)" ontouchend="oUp(2, event)" style="font-size:1.4rem; cursor:pointer; user-select:none;">🤍 <span id="o-p2" style="font-family:var(--font-b); font-weight:600; font-size:1rem; margin-left:4px;">0</span></div>
+     </div>
+     <div class="pill-opts" id="intentionsPills" style="justify-content:center; margin-bottom:10px; gap:8px;"></div>
+     <input type="text" id="intentionsNote" placeholder="Notes (e.g. after your shift)" style="width:100%; background:var(--card2); border:1px solid var(--border2); border-radius:6px; color:var(--text); font-family:var(--font-b); font-size:0.75rem; padding:10px; outline:none;" onchange="saveIntentionsNote()">
+  </div>
   
   <div class="sec-head" style="margin-top:20px;"><div class="sec-title">Today's Schedule</div></div>
   <div id="dashEvents"></div>
@@ -393,7 +409,7 @@ section.active { display:block; }
     <div class="modal-title">Log For <span id="logModalDateTitle"></span></div>
     <label>Flow Intensity</label>
     <div class="pill-opts" id="logFlow"><div class="pill" data-val="spotting">Spotting</div><div class="pill" data-val="light">Light</div><div class="pill" data-val="medium">Medium</div><div class="pill" data-val="heavy">Heavy</div></div>
-    <label>Intimacy</label>
+    <label>Intimacy History</label>
     <div class="pill-opts" id="logSex"><div class="pill" data-val="piv">PIV</div><div class="pill" data-val="fellatio">Fellatio</div><div class="pill" data-val="cunnilingus">Cunnilingus</div><div class="pill" data-val="anal">Anal</div><div class="pill" data-val="mutual">Mutual</div><div class="pill" data-val="toys">Toys</div></div>
     <div class="row2"><div><label>BBT Temp (°F)</label><input type="number" step="0.1" id="logBBT" placeholder="97.8"></div><div><label>Cervical Mucus</label><select id="logCM"><option value="">None</option><option value="sticky">Sticky</option><option value="creamy">Creamy</option><option value="eggwhite">Egg White</option><option value="themother">The Mother</option></select></div></div>
     <label>Symptoms & Mood</label>
@@ -451,8 +467,13 @@ section.active { display:block; }
     <input type="hidden" id="em-id">
     <label>Title</label>
     <input type="text" id="em-title" placeholder="e.g. Botanical Wine Tour">
-    <div class="row2"><div><label>Date</label><input type="date" id="em-date"></div><div><label>Time</label><input type="time" id="em-time" value="19:00"></div></div>
-    <div class="row2"><div><label>End Time (opt)</label><input type="time" id="em-end"></div><div><label>Who?</label><select id="em-who"><option value="both">Both</option><option value="p1">Rebecca</option><option value="p2">Marius</option></select></div></div>
+    
+    <label style="display:flex; align-items:center; gap:8px; margin:14px 0 10px; font-size:0.8rem; color:var(--text); text-transform:none;">
+      <input type="checkbox" id="em-allday" onchange="document.getElementById('em-time-row').style.display=this.checked?'none':'grid'" style="width:auto; transform:scale(1.2);"> All Day Event
+    </label>
+    
+    <div class="row2" style="margin-bottom:10px;"><div><label style="margin-top:0;">Date</label><input type="date" id="em-date"></div><div><label style="margin-top:0;">Who?</label><select id="em-who"><option value="both">Both</option><option value="p1">Rebecca</option><option value="p2">Marius</option></select></div></div>
+    <div class="row2" id="em-time-row"><div><label style="margin-top:0;">Time</label><input type="time" id="em-time" value="19:00"></div><div><label style="margin-top:0;">End Time (opt)</label><input type="time" id="em-end"></div></div>
     
     <label style="display:flex; align-items:center; gap:8px; margin-top:14px; font-size:0.75rem;">
       <input type="checkbox" id="em-intimacy" onchange="document.getElementById('em-intimacy-section').style.display=this.checked?'block':'none'" style="width:auto; transform:scale(1.2);"> Schedule Intimacy 🤍
@@ -510,19 +531,26 @@ section.active { display:block; }
 // ═══════════════════════════════════
 // STATE & INIT
 // ═══════════════════════════════════
+let boardHistory = []; 
 const now = new Date();
 const todayISO = now.toISOString().slice(0,10);
 let selDate = todayISO;
 let tempSubtasks = [];
 let viewMode = 'month';
-let boardHistory = []; 
+
+const I_ACTS = [
+  {k:'piv', e:'🐱'}, {k:'fellatio', e:'💦'}, {k:'cunnilingus', e:'👅'}, 
+  {k:'anal', e:'🕳️'}, {k:'mutual', e:'🫱🏼‍🫲🏽'}, {k:'toys', e:'⚡'}, 
+  {k:'solo_f', e:'🪄'}, {k:'solo_m', e:'💀'}
+];
 
 const DEFAULT = {
   pts1: 0, pts2: 0, streak: 0,
   cycle: { periodStarts: [], dailyLogs: {}, defaultCycleLen: 28, defaultPeriodLen: 5, lutealPhase: 14 },
   habits: [], events: [], togetherWindows: [], scheduleOverrides: [],
   rewards: [ {id: 1, name: 'Cunnilingus', icon: '👅', cost: 100}, {id: 2, name: 'Mop the Floor', icon: '🧹', cost: 50} ],
-  medsCheck: {}, boardImage: '', boardText: '', lastReset: '', selectedColor: '#b09cda'
+  medsCheck: {}, boardImage: '', boardText: '', lastReset: '', selectedColor: '#b09cda',
+  intentions: { acts: [], notes: '' }, orgasmLog: {}
 };
 
 const P1_WORK = { 1:{start:'12:15',end:'23:00'}, 2:{start:'12:15',end:'23:00'}, 3:{start:'08:00',end:'18:45'}, 4:null, 5:{start:'08:00',end:'18:45'}, 6:null, 0:null };
@@ -530,15 +558,13 @@ const P2_WORK = { 1:{start:'10:30',end:'19:00'}, 2:{start:'10:30',end:'19:00'}, 
 const DAYS3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 let S = deepClone(DEFAULT);
-// CRITICAL: Bumping local storage key to ct22 to ensure clean state initialization.
-const saved = localStorage.getItem('ct22'); 
+const saved = localStorage.getItem('ct23'); 
 if(saved){ try{ S = {...S, ...JSON.parse(saved)}; }catch(e){} }
 
-// Strict Fallbacks
 if(!S.habits) S.habits = []; if(!S.events) S.events = []; if(!S.rewards) S.rewards = [];
 if(!S.cycle) S.cycle = deepClone(DEFAULT.cycle); if(!S.cycle.dailyLogs) S.cycle.dailyLogs = {}; if(!S.medsCheck) S.medsCheck = {};
 if(!S.togetherWindows) S.togetherWindows = []; if(!S.scheduleOverrides) S.scheduleOverrides = [];
-
+if(!S.intentions) S.intentions = {acts:[], notes:''}; if(!S.orgasmLog) S.orgasmLog = {};
 
 // ── Nightly Reset & Debt Logic ──
 if(S.lastReset !== todayISO){
@@ -547,8 +573,6 @@ if(S.lastReset !== todayISO){
     let shouldReset = false;
     if (h.freq === 'daily') shouldReset = true;
     if (h.freq === 'custom' && h.customDays && h.customDays.includes(todayDow)) shouldReset = true;
-    
-    // Legacy support
     if (h.freq === 'weekly' && now.getDay() === 1) shouldReset = true;
     if (h.freq === 'interval' && h.lastDoneDate && (now - new Date(h.lastDoneDate)) > 3 * 86400000) shouldReset = true;
     
@@ -564,6 +588,7 @@ if(S.lastReset !== todayISO){
     }
   });
   S.boardImage = ''; S.boardText = ''; boardHistory = []; 
+  S.intentions = {acts:[], notes:''}; 
   S.lastReset = todayISO; 
   S.habits = S.habits.filter(h => !h.deletedAt || (Date.now() - h.deletedAt < 86400000));
   save();
@@ -573,7 +598,7 @@ document.getElementById('hdate').textContent = now.toLocaleDateString('en-US',{w
 document.getElementById('boardText').value = S.boardText || '';
 
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
-function save(){ localStorage.setItem('ct22', JSON.stringify(S)); }
+function save(){ localStorage.setItem('ct23', JSON.stringify(S)); }
 function n1(){ return document.getElementById('name1').value||'Rebecca'; }
 function n2(){ return document.getElementById('name2').value||'Marius'; }
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2400); }
@@ -602,7 +627,92 @@ function hexToRgba(hex, alpha) {
 }
 
 // ═══════════════════════════════════
-// SCHEDULE OVERRIDES & WORK STRIP
+// DASHBOARD (COUNTDOWN & INTENTIONS)
+// ═══════════════════════════════════
+let cdInterval;
+function renderCountdown() {
+   const wrap = document.getElementById('dashCountdown');
+   let allSched = [];
+   S.events.filter(e => e.isIntimacy && e.date >= todayISO).forEach(e => allSched.push({ type: 'ev', date: e.date, time: e.allDay ? '00:00' : (e.time||'00:00'), name: e.title, allDay: e.allDay }));
+   S.togetherWindows.filter(w => w.end >= todayISO).forEach(w => {
+      let d = w.start < todayISO ? todayISO : w.start;
+      allSched.push({ type: 'tw', date: d, time: '00:00', name: w.label || 'Together Window', allDay: true });
+   });
+
+   if(allSched.length === 0) { wrap.style.display = 'none'; clearInterval(cdInterval); return; }
+   
+   allSched.sort((a,b) => {
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      return a.time.localeCompare(b.time);
+   });
+   
+   const next = allSched[0];
+   wrap.style.display = 'block';
+   
+   if(next.date === todayISO) {
+      if (next.allDay) {
+         document.getElementById('cd-text').innerHTML = `Today 🤎<br><span style="font-size:0.75rem; color:var(--muted);">${next.name}</span>`;
+      } else {
+         clearInterval(cdInterval);
+         const targetTime = new Date(`${next.date}T${next.time}:00`);
+         const updateClock = () => {
+            const diff = targetTime - new Date();
+            if(diff <= 0) { document.getElementById('cd-text').innerHTML = `Today 🤎<br><span style="font-size:0.75rem; color:var(--muted);">${next.name}</span>`; return; }
+            const h = Math.floor(diff / 3600000); const m = Math.floor((diff % 3600000) / 60000);
+            document.getElementById('cd-text').innerHTML = `Today 🤎<br><span style="font-size:1rem; color:var(--text);">${h}h ${m}m</span><br><span style="font-size:0.6rem; color:var(--muted);">${next.name}</span>`;
+         };
+         updateClock(); cdInterval = setInterval(updateClock, 60000);
+      }
+   } else {
+      clearInterval(cdInterval);
+      const diffDays = Math.ceil((new Date(next.date) - new Date(todayISO)) / 86400000);
+      document.getElementById('cd-text').innerHTML = `${diffDays} days away 🤎<br><span style="font-size:0.75rem; color:var(--muted);">${next.name}</span>`;
+   }
+}
+
+let oTouchData = {1:null, 2:null};
+function oDown(p, e) {
+   if(e.type==='touchstart') e.preventDefault();
+   if(e.type==='mousedown' && oTouchData[p] && oTouchData[p].isTouch) return;
+   oTouchData[p] = { time: Date.now(), isTouch: e.type==='touchstart', fired: false, timer: setTimeout(()=>{ oTouchData[p].fired=true; modO(p, -1); navigator.vibrate&&navigator.vibrate(50); }, 500) };
+}
+function oUp(p, e) {
+   if(e.type==='touchend') e.preventDefault();
+   if(!oTouchData[p]) return;
+   clearTimeout(oTouchData[p].timer);
+   if(!oTouchData[p].fired && (Date.now() - oTouchData[p].time < 500)) modO(p, 1);
+   oTouchData[p] = null;
+}
+function oCancel(p) { if(oTouchData[p]) { clearTimeout(oTouchData[p].timer); oTouchData[p] = null; } }
+
+function modO(p, dir) {
+   if(!S.orgasmLog[todayISO]) S.orgasmLog[todayISO] = {p1:0, p2:0};
+   if(p===1) S.orgasmLog[todayISO].p1 = Math.max(0, S.orgasmLog[todayISO].p1 + dir);
+   if(p===2) S.orgasmLog[todayISO].p2 = Math.max(0, S.orgasmLog[todayISO].p2 + dir);
+   save(); renderIntentions(); renderCalendar();
+}
+
+function toggleIntention(act) {
+   if(S.intentions.acts.includes(act)) S.intentions.acts = S.intentions.acts.filter(x=>x!==act);
+   else S.intentions.acts.push(act);
+   save(); renderIntentions(); renderCalendar(); 
+}
+function saveIntentionsNote() { S.intentions.notes = document.getElementById('intentionsNote').value; save(); renderCalendar(); }
+
+function renderIntentions() {
+   const wrap = document.getElementById('intentionsPills');
+   if(wrap) {
+       wrap.innerHTML = I_ACTS.map(a => `<div class="pill ${S.intentions.acts.includes(a.k)?'active':''}" onclick="toggleIntention('${a.k}')">${a.e}</div>`).join('');
+       document.getElementById('intentionsNote').value = S.intentions.notes || '';
+   }
+   const log = S.orgasmLog[todayISO] || {p1:0, p2:0};
+   const elP1 = document.getElementById('o-p1'), elP2 = document.getElementById('o-p2');
+   if(elP1) elP1.textContent = log.p1;
+   if(elP2) elP2.textContent = log.p2;
+}
+
+// ═══════════════════════════════════
+// WORK STRIP & OVERRIDES
 // ═══════════════════════════════════
 function getShift(dateStr, player) {
   const dow = new Date(dateStr + 'T12:00:00').getDay();
@@ -616,57 +726,27 @@ function getShift(dateStr, player) {
   return { type: 'off', isOverride: false };
 }
 
-function openOverrideModal() {
-   document.getElementById('ov-date').value = selDate;
-   document.getElementById('ov-who').value = 'p1';
-   document.getElementById('ov-type').value = 'off';
-   document.getElementById('ov-time-sec').style.display = 'none';
-   document.getElementById('ov-start').value = '09:00';
-   document.getElementById('ov-end').value = '17:00';
-   openModal('overrideModal');
-}
-
+function openOverrideModal() { document.getElementById('ov-date').value = selDate; document.getElementById('ov-who').value = 'p1'; document.getElementById('ov-type').value = 'off'; document.getElementById('ov-time-sec').style.display = 'none'; document.getElementById('ov-start').value = '09:00'; document.getElementById('ov-end').value = '17:00'; openModal('overrideModal'); }
 function addOverride() {
-   const date = document.getElementById('ov-date').value;
-   const who = document.getElementById('ov-who').value;
-   const type = document.getElementById('ov-type').value;
-   const start = document.getElementById('ov-start').value;
-   const end = document.getElementById('ov-end').value;
-
+   const date = document.getElementById('ov-date').value; const who = document.getElementById('ov-who').value; const type = document.getElementById('ov-type').value; const start = document.getElementById('ov-start').value; const end = document.getElementById('ov-end').value;
    if(!date) return;
    S.scheduleOverrides = S.scheduleOverrides.filter(o => !(o.date === date && o.who === who));
    S.scheduleOverrides.push({ id: Date.now(), date, who, type, start: type==='custom'?start:null, end: type==='custom'?end:null });
    save(); closeModal('overrideModal'); renderAll(); toast('Override Saved!');
 }
-
-function deleteOverride(id) {
-   S.scheduleOverrides = S.scheduleOverrides.filter(o => o.id !== id);
-   save(); renderAll(); toast('Override Removed');
-}
-
-function fmt12(t){ if(!t) return ''; const [h,m] = t.split(':'); const hr = parseInt(h); return `${hr>12?hr-12:hr||12}:${m}${hr>=12?'pm':'am'}`; }
+function deleteOverride(id) { S.scheduleOverrides = S.scheduleOverrides.filter(o => o.id !== id); save(); renderAll(); toast('Override Removed'); }
 
 function renderWorkStrip(){
   const el = document.getElementById('workStrip'); el.innerHTML = ''; 
-  const todayDow = now.getDay();
-  const dowAdjust = todayDow === 0 ? 6 : todayDow - 1; 
-  const baseDate = new Date(todayISO + 'T12:00:00');
-  const mondayDate = new Date(baseDate);
-  mondayDate.setDate(baseDate.getDate() - dowAdjust);
+  const todayDow = now.getDay(); const dowAdjust = todayDow === 0 ? 6 : todayDow - 1; 
+  const baseDate = new Date(todayISO + 'T12:00:00'); const mondayDate = new Date(baseDate); mondayDate.setDate(baseDate.getDate() - dowAdjust);
 
   for(let i=0; i<7; i++){
-    let d = new Date(mondayDate); d.setDate(mondayDate.getDate() + i);
-    let dStr = d.toISOString().slice(0,10);
-    let targetDow = d.getDay(); 
-
-    const s1 = getShift(dStr, 'p1');
-    const s2 = getShift(dStr, 'p2');
-    const isToday = dStr === todayISO;
-
+    let d = new Date(mondayDate); d.setDate(mondayDate.getDate() + i); let dStr = d.toISOString().slice(0,10); let targetDow = d.getDay(); 
+    const s1 = getShift(dStr, 'p1'); const s2 = getShift(dStr, 'p2'); const isToday = dStr === todayISO;
     const dEl = document.createElement('div'); dEl.className = `wday ${isToday ? 'is-today' : ''}`;
     let html1 = s1.type !== 'off' ? `<div class="wday-shift shift-p1" ${s1.isOverride?'style="border:1px dashed var(--warning);"':''}>${s1.isOverride?'⚠️ ':''}${fmt12(s1.start)} - ${fmt12(s1.end)}</div>` : `<div class="wday-shift shift-off" ${s1.isOverride?'style="border:1px dashed var(--warning); color:var(--warning);"':''}>${s1.isOverride?'⚠️ ':''}Off</div>`;
     let html2 = s2.type !== 'off' ? `<div class="wday-shift shift-p2" ${s2.isOverride?'style="border:1px dashed var(--warning);"':''}>${s2.isOverride?'⚠️ ':''}${fmt12(s2.start)} - ${fmt12(s2.end)}</div>` : `<div class="wday-shift shift-off" ${s2.isOverride?'style="border:1px dashed var(--warning); color:var(--warning);"':''}>${s2.isOverride?'⚠️ ':''}Off</div>`;
-
     dEl.innerHTML = `<div class="wday-name">${DAYS3[targetDow]}</div>${html1}${html2}`;
     el.appendChild(dEl);
   }
@@ -772,8 +852,7 @@ function addInlineSub(hid, parentSid) {
   if (!inp || !inp.value.trim()) return;
   const h = S.habits.find(x => x.id === hid); if(!h) return;
   const s = h.subtasks.find(x => x.id === parentSid); if(!s) return;
-  if (!s.subs) s.subs = [];
-  s.subs.push({ id: Date.now(), text: inp.value.trim(), done: false });
+  if (!s.subs) s.subs = []; s.subs.push({ id: Date.now(), text: inp.value.trim(), done: false });
   inp.value = ''; save(); renderAll();
 }
 
@@ -831,21 +910,10 @@ function makeQuestEl(h){
       </div>
       ${subsTotal > 0 ? `<div class="subtasks-container" id="qsub-${h.id}">
         ${h.subtasks.map((s) => `
-          <div class="sub-item">
-            <div class="sub-chk ${s.done ? 'done' : ''}" onclick="toggleSub(${h.id}, ${s.id})">${s.done ? '✓' : ''}</div>
-            <span style="text-decoration: ${s.done ? 'line-through' : 'none'};">${s.text}</span>
-          </div>
+          <div class="sub-item"><div class="sub-chk ${s.done ? 'done' : ''}" onclick="toggleSub(${h.id}, ${s.id})">${s.done ? '✓' : ''}</div><span style="text-decoration: ${s.done ? 'line-through' : 'none'};">${s.text}</span></div>
           <div style="margin-left: 24px; margin-bottom:8px; display: ${s.done ? 'none' : 'block'}; border-left:1px solid var(--border); padding-left:8px;">
-            ${(s.subs || []).map((ss) => `
-                <div class="sub-item">
-                    <div class="sub-chk ${ss.done ? 'done' : ''}" onclick="toggleSubSub(${h.id}, ${s.id}, ${ss.id})">${ss.done ? '✓' : ''}</div>
-                    <span style="text-decoration: ${ss.done ? 'line-through' : 'none'}; font-size:0.7rem;">${ss.text}</span>
-                </div>
-            `).join('')}
-            <div class="step-input-row" style="margin-top:2px;">
-               <input type="text" id="inline-sub-${h.id}-${s.id}" placeholder="Sub-task..." style="padding:4px 8px; font-size:0.65rem;">
-               <button class="step-add-btn" style="padding:4px 8px; font-size:0.65rem;" onclick="addInlineSub(${h.id}, ${s.id})">Add</button>
-            </div>
+            ${(s.subs || []).map((ss) => `<div class="sub-item"><div class="sub-chk ${ss.done ? 'done' : ''}" onclick="toggleSubSub(${h.id}, ${s.id}, ${ss.id})">${ss.done ? '✓' : ''}</div><span style="text-decoration: ${ss.done ? 'line-through' : 'none'}; font-size:0.7rem;">${ss.text}</span></div>`).join('')}
+            <div class="step-input-row" style="margin-top:2px;"><input type="text" id="inline-sub-${h.id}-${s.id}" placeholder="Sub-task..." style="padding:4px 8px; font-size:0.65rem;"><button class="step-add-btn" style="padding:4px 8px; font-size:0.65rem;" onclick="addInlineSub(${h.id}, ${s.id})">Add</button></div>
           </div>
         `).join('')}
       </div>` : ''}
@@ -923,7 +991,7 @@ function addTogetherWindow() {
   const start = document.getElementById('tw-start').value; const end = document.getElementById('tw-end').value; const label = document.getElementById('tw-label').value.trim();
   if(!start || !end || start > end) { toast('Invalid dates!'); return; }
   S.togetherWindows.push({ id: Date.now(), start, end, label, color: twColor });
-  save(); closeModal('togetherModal'); renderCalendar(); renderEventList(); toast('Together Window created!');
+  save(); closeModal('togetherModal'); renderCalendar(); renderEventList(); renderCountdown(); toast('Together Window created!');
 }
 
 function openEventModal(eid = null) {
@@ -931,30 +999,32 @@ function openEventModal(eid = null) {
   if(eid) {
     const ev = S.events.find(x => x.id === eid); if(!ev) return;
     document.getElementById('em-modal-title').textContent = "Edit Event"; el.value = ev.id; document.getElementById('em-title').value = ev.title; document.getElementById('em-date').value = ev.date; document.getElementById('em-time').value = ev.time || ''; document.getElementById('em-end').value = ev.end || ''; document.getElementById('em-who').value = ev.who; document.getElementById('em-intimacy').checked = ev.isIntimacy || false; document.getElementById('em-intimacy-section').style.display = ev.isIntimacy ? 'block' : 'none';
+    document.getElementById('em-allday').checked = ev.allDay || false; document.getElementById('em-time-row').style.display = ev.allDay ? 'none' : 'grid';
     document.querySelectorAll('#em-intimacy-acts .pill').forEach(p => { p.classList.remove('active'); if(ev.intimacyActs && ev.intimacyActs.includes(p.dataset.val)) p.classList.add('active'); });
     if (ev.isIntimacy) { document.getElementById('em-intimacy-type').value = ev.intimacyType || 'spontaneous'; document.getElementById('em-intimacy-pts').value = ev.intimacyPts || 50; document.getElementById('em-intimacy-who').value = ev.intimacyWho || 'p1'; document.getElementById('em-intimacy-deferred').checked = ev.intimacyDeferred !== false; document.getElementById('em-intimacy-pts-sec').style.display = (ev.intimacyType==='reward'||ev.intimacyType==='punishment')?'grid':'none'; }
     const swatch = document.querySelector(`#colorOpts .color-opt[data-c="${ev.color}"]`); if(swatch) pickColor(swatch);
   } else {
     document.getElementById('em-modal-title').textContent = "New Event"; el.value = ''; document.getElementById('em-title').value = ''; document.getElementById('em-date').value = selDate; document.getElementById('em-time').value = '19:00'; document.getElementById('em-end').value = ''; document.getElementById('em-intimacy').checked = false; document.getElementById('em-intimacy-section').style.display = 'none'; document.querySelectorAll('#em-intimacy-acts .pill').forEach(p => p.classList.remove('active'));
+    document.getElementById('em-allday').checked = false; document.getElementById('em-time-row').style.display = 'grid';
   }
   openModal('eventModal');
 }
 
 function addEvent(){
-  const title = document.getElementById('em-title').value.trim(); const date = document.getElementById('em-date').value; const time = document.getElementById('em-time').value; const end = document.getElementById('em-end').value; const who = document.getElementById('em-who').value; const isIntimacy = document.getElementById('em-intimacy').checked;
+  const title = document.getElementById('em-title').value.trim(); const date = document.getElementById('em-date').value; const time = document.getElementById('em-time').value; const end = document.getElementById('em-end').value; const who = document.getElementById('em-who').value; const isIntimacy = document.getElementById('em-intimacy').checked; const isAllDay = document.getElementById('em-allday').checked;
   if(!title||!date) return; const id = document.getElementById('em-id').value;
   
   let acts = []; document.querySelectorAll('#em-intimacy-acts .pill.active').forEach(p => acts.push(p.dataset.val));
   const iType = document.getElementById('em-intimacy-type').value; const iPts = parseInt(document.getElementById('em-intimacy-pts').value)||0; const iWho = document.getElementById('em-intimacy-who').value; const iDef = document.getElementById('em-intimacy-deferred').checked;
   
-  let baseEv = { title, date, time: time || null, end, who, color: S.selectedColor, isIntimacy, intimacyActs: acts, intimacyType: iType, intimacyPts: iPts, intimacyWho: iWho, intimacyDeferred: iDef };
+  let baseEv = { title, date, time: time || null, end, who, color: S.selectedColor, isIntimacy, intimacyActs: acts, intimacyType: iType, intimacyPts: iPts, intimacyWho: iWho, intimacyDeferred: iDef, allDay: isAllDay };
   
   if(id) { const ev = S.events.find(x => x.id == id); if(ev) Object.assign(ev, baseEv); toast('Event Updated'); } 
   else { 
     baseEv.id = Date.now(); baseEv.isCompleted = false; S.events.push(baseEv); toast('Event Added'); 
     if (isIntimacy && !iDef && !baseEv.isCompleted && (iType === 'reward' || iType === 'punishment')) { processIntimacyPoints(baseEv.id, true); }
   }
-  document.getElementById('em-id').value=''; document.getElementById('em-title').value=''; save(); closeModal('eventModal'); renderCalendar(); renderEventList(); 
+  document.getElementById('em-id').value=''; document.getElementById('em-title').value=''; save(); closeModal('eventModal'); renderCalendar(); renderEventList(); renderCountdown();
 }
 
 function processIntimacyPoints(eid, silent = false) {
@@ -990,8 +1060,10 @@ function renderCalendar(){
   if (viewMode === 'month' || viewMode === 'week') {
     cells.forEach((c, index) => {
       const dateStr = `${c.year}-${String(c.month+1).padStart(2,'0')}-${String(c.d).padStart(2,'0')}`;
-      const cycleData = getCyclePhase(dateStr); const logData = S.cycle.dailyLogs[dateStr]; 
-      const eventsOnDay = S.events.filter(e => e.date === dateStr).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+      const cycleData = getCyclePhase(dateStr); const logData = S.cycle.dailyLogs[dateStr]; const oLog = S.orgasmLog[dateStr];
+      const eventsOnDay = S.events.filter(e => e.date === dateStr).sort((a,b)=>{
+         if(a.allDay && !b.allDay) return -1; if(!a.allDay && b.allDay) return 1; return (a.time||'').localeCompare(b.time||'');
+      });
       
       const cell = document.createElement('div'); cell.className='cal-cell'+(c.other?' other-month':'')+(dateStr===todayISO?' today':'')+(dateStr===selDate?' selected':'');
       if(cycleData && cycleData.phase !== 'default') cell.style.backgroundColor = cycleData.color;
@@ -1006,21 +1078,30 @@ function renderCalendar(){
       }
 
       let iconsHtml = ''; if(cycleData && cycleData.icon) iconsHtml += `<span>${cycleData.icon}</span>`; if(logData && logData.sex && logData.sex.length > 0) iconsHtml += `<span>🤍</span>`;
+      if(oLog && (oLog.p1 > 0 || oLog.p2 > 0)) iconsHtml += `<span style="font-weight:bold; font-size:0.55rem; color:var(--muted); margin-left:2px;">🤎${oLog.p1||0} 🤍${oLog.p2||0}</span>`;
+
       const eventBarsHtml = eventsOnDay.map(e => viewMode === 'week' ? `<div class="cal-bar-text" style="background:${e.color};">${e.isIntimacy?'🤍 ':''}${e.title}</div>` : `<div class="cal-bar" style="background:${e.color};"></div>`).join('');
       cell.innerHTML=`${twHtml}<div class="cal-log-icons">${iconsHtml}</div><span class="cal-num" style="z-index:2; margin-top:${twHtml?'10px':'0'};">${c.d}</span><div class="cal-bars">${eventBarsHtml}</div>`;
       cell.addEventListener('click', () => { selDate = dateStr; viewMode = 'day'; renderCalendar(); renderEventList(); }); grid.appendChild(cell);
     });
   } else if (viewMode === 'day') {
-    const cd = getCyclePhase(selDate); const log = S.cycle.dailyLogs[selDate];
+    const cd = getCyclePhase(selDate); const log = S.cycle.dailyLogs[selDate]; const oLog = S.orgasmLog[selDate];
     const cycleText = cd && cd.phase !== 'default' ? `<div style="padding:12px; border-radius:12px; background:${cd.color}; margin:10px 0; font-size:0.85rem; border: 1px solid var(--border);">${cd.icon} <span style="text-transform:capitalize; font-weight:600; color:var(--text);">${cd.phase}</span> (Day ${cd.day})</div>` : `<div style="padding:12px; border-radius:12px; background:var(--card2); margin:10px 0; font-size:0.85rem; border: 1px solid var(--border);">Follicular / Luteal Phase (Day ${cd ? cd.day : '?'})</div>`;
     let loggedItemsHtml = '';
-    if (log) {
-        if(log.flow) loggedItemsHtml += `<span style="background:rgba(224, 120, 120, 0.2); color:#e07878; padding:3px 8px; border-radius:12px; font-size:0.7rem; margin:2px;">🩸 ${log.flow} flow</span>`;
-        if(log.sex && log.sex.length > 0) loggedItemsHtml += `<span style="background:rgba(176, 156, 218, 0.2); color:var(--shared); padding:3px 8px; border-radius:12px; font-size:0.7rem; margin:2px;">🤍 Log: ${log.sex.join(', ')}</span>`;
-        if(log.bbt) loggedItemsHtml += `<span style="background:var(--card2); color:var(--muted); padding:3px 8px; border-radius:12px; font-size:0.7rem; margin:2px;">🌡️ ${log.bbt}°</span>`;
-        if(log.symp && log.symp.length > 0) loggedItemsHtml += `<div style="font-size:0.75rem; color:var(--muted); margin-top:8px;">Symptoms: ${log.symp.join(', ')}</div>`;
+    if (log || (oLog && (oLog.p1>0 || oLog.p2>0))) {
+        if(log && log.flow) loggedItemsHtml += `<span style="background:rgba(224, 120, 120, 0.2); color:#e07878; padding:3px 8px; border-radius:12px; font-size:0.7rem; margin:2px;">🩸 ${log.flow} flow</span>`;
+        if(log && log.sex && log.sex.length > 0) loggedItemsHtml += `<span style="background:rgba(176, 156, 218, 0.2); color:var(--shared); padding:3px 8px; border-radius:12px; font-size:0.7rem; margin:2px;">🤍 Log: ${log.sex.join(', ')}</span>`;
+        if(oLog && (oLog.p1 > 0 || oLog.p2 > 0)) loggedItemsHtml += `<span style="background:rgba(212, 169, 106, 0.1); color:var(--gold); padding:3px 8px; border-radius:12px; font-size:0.7rem; margin:2px;">🤎 × ${oLog.p1||0} &nbsp;🤍 × ${oLog.p2||0}</span>`;
+        if(log && log.bbt) loggedItemsHtml += `<span style="background:var(--card2); color:var(--muted); padding:3px 8px; border-radius:12px; font-size:0.7rem; margin:2px;">🌡️ ${log.bbt}°</span>`;
+        if(log && log.symp && log.symp.length > 0) loggedItemsHtml += `<div style="width:100%; font-size:0.75rem; color:var(--muted); margin-top:8px;">Symptoms: ${log.symp.join(', ')}</div>`;
     }
-    grid.innerHTML = `<div class="day-view-header"><button class="day-view-back" onclick="viewMode='month'; renderCalendar(); renderEventList();">← Back</button><div style="font-family:var(--font-d); font-size:1.8rem; color:var(--shared); line-height:1.2;">${refDate.toLocaleDateString('en-US',{weekday:'long'})}</div><div style="font-size:0.9rem; color:var(--muted);">${refDate.toLocaleDateString('en-US',{month:'long', day:'numeric'})}</div>${cycleText}<div style="display:flex; flex-wrap:wrap; justify-content:center; margin-top:8px;">${loggedItemsHtml}</div></div>`;
+    
+    if (selDate === todayISO && S.intentions && (S.intentions.acts.length > 0 || S.intentions.notes)) {
+       let intActs = S.intentions.acts.map(k => I_ACTS.find(x=>x.k===k).e).join(' ');
+       loggedItemsHtml += `<div style="width:100%; text-align:center; margin-top:10px; padding:10px; background:var(--card); border-radius:8px; border:1px dashed rgba(232,164,184,0.3);"><div style="font-size:0.7rem; color:var(--p1); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Tonight's Intentions 🤎</div><div style="font-size:1.2rem;">${intActs}</div>${S.intentions.notes ? `<div style="font-size:0.75rem; color:var(--muted); margin-top:4px;">${S.intentions.notes}</div>` : ''}</div>`;
+    }
+
+    grid.innerHTML = `<div class="day-view-header"><button class="day-view-back" onclick="viewMode='month'; renderCalendar(); renderEventList();">← Back</button><div style="position:absolute; right:0; top:15px; display:flex; gap:4px;"><button class="sec-add" onclick="openOverrideModal()" style="color:var(--warning); border-color:var(--warning); padding:4px 8px; font-size:0.6rem;">+ Override</button><button class="sec-add" onclick="openEventModal()" style="padding:4px 8px; font-size:0.6rem;">+ Event</button></div><div style="font-family:var(--font-d); font-size:1.8rem; color:var(--shared); line-height:1.2; margin-top:20px;">${refDate.toLocaleDateString('en-US',{weekday:'long'})}</div><div style="font-size:0.9rem; color:var(--muted);">${refDate.toLocaleDateString('en-US',{month:'long', day:'numeric'})}</div>${cycleText}<div style="display:flex; flex-wrap:wrap; justify-content:center; margin-top:8px;">${loggedItemsHtml}</div></div>`;
   }
 }
 
@@ -1033,14 +1114,19 @@ function makeEventEl(ev, compact){
       completionHtml = `<button class="approve-btn" style="margin-right:6px;" onclick="processIntimacyPoints(${ev.id})">Complete</button>`;
   }
 
-  d.innerHTML=`<div class="ev-time">${fmt12(ev.time)}</div><div class="ev-body"><div class="ev-title">${ev.isIntimacy?'🤍 ':''}${ev.title} ${ev.isCompleted?'<span style="font-size:0.6rem;color:var(--success);">✓</span>':''}</div><div class="ev-who">${whoLabel} ${ev.end?' until '+fmt12(ev.end):''}</div></div>${completionHtml}${!compact?`<button class="edit-btn" onclick="openEventModal(${ev.id})">✎</button><button class="del-btn" onclick="S.events=S.events.filter(x=>x.id!==${ev.id}); save(); renderCalendar(); renderEventList();">✕</button>`:''}`;
+  let timeStr = ev.allDay ? 'All Day' : fmt12(ev.time);
+  let endStr = (!ev.allDay && ev.end) ? ' until '+fmt12(ev.end) : '';
+
+  d.innerHTML=`<div class="ev-time">${timeStr}</div><div class="ev-body"><div class="ev-title">${ev.isIntimacy?'🤍 ':''}${ev.title} ${ev.isCompleted?'<span style="font-size:0.6rem;color:var(--success);">✓</span>':''}</div><div class="ev-who">${whoLabel} ${endStr}</div></div>${completionHtml}${!compact?`<button class="edit-btn" onclick="openEventModal(${ev.id})">✎</button><button class="del-btn" onclick="S.events=S.events.filter(x=>x.id!==${ev.id}); save(); renderCalendar(); renderEventList();">✕</button>`:''}`;
   return d;
 }
 
 function renderEventList(){
   try {
     const el = document.getElementById('eventList'); el.innerHTML='';
-    const selEvents = S.events.filter(e=>e.date===selDate).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+    const selEvents = S.events.filter(e=>e.date===selDate).sort((a,b)=>{
+       if(a.allDay && !b.allDay) return -1; if(!a.allDay && b.allDay) return 1; return (a.time||'').localeCompare(b.time||'');
+    });
     const s1Day = getShift(selDate, 'p1'); const s2Day = getShift(selDate, 'p2');
     if(!S.medsCheck[selDate]) S.medsCheck[selDate] = {p1:false, p2:false};
     
@@ -1057,7 +1143,7 @@ function renderEventList(){
       }
 
       activeTw.forEach(tw => {
-          el.innerHTML += `<div class="event-item tw-block" style="border-left-color:${tw.color};"><div class="ev-time" style="font-size:1rem;">🤎</div><div class="ev-body"><div class="ev-title" style="color:${tw.color};">Together Window</div><div class="ev-who">${tw.label || 'Shared Time'}</div></div><button class="del-btn" onclick="S.togetherWindows=S.togetherWindows.filter(x=>x.id!==${tw.id}); save(); renderCalendar(); renderEventList();">✕</button></div>`;
+          el.innerHTML += `<div class="event-item tw-block" style="border-left-color:${tw.color};"><div class="ev-time" style="font-size:1rem;">🤎</div><div class="ev-body"><div class="ev-title" style="color:${tw.color};">Together Window</div><div class="ev-who">${tw.label || 'Shared Time'}</div></div><button class="del-btn" onclick="S.togetherWindows=S.togetherWindows.filter(x=>x.id!==${tw.id}); save(); renderCalendar(); renderEventList(); renderCountdown();">✕</button></div>`;
       });
       if(s1Day.type !== 'off') el.innerHTML+= `<div class="med-item"><button class="med-check ${S.medsCheck[selDate].p1?'done':''}" onclick="toggleMed('${selDate}','p1')">✓</button><div class="med-text ${S.medsCheck[selDate].p1?'done':''}">${fmt12(s1Day.start)} - ${n1()}'s Meds</div></div>`;
       if(s2Day.type !== 'off') el.innerHTML+= `<div class="med-item"><button class="med-check ${S.medsCheck[selDate].p2?'done':''}" onclick="toggleMed('${selDate}','p2')">✓</button><div class="med-text ${S.medsCheck[selDate].p2?'done':''}">${fmt12(s2Day.start)} - ${n2()}'s Meds</div></div>`;
@@ -1068,7 +1154,9 @@ function renderEventList(){
     selEvents.forEach(ev=>el.appendChild(makeEventEl(ev)));
 
     const dash = document.getElementById('dashEvents'); dash.innerHTML='';
-    const todayEvents = S.events.filter(e=>e.date===todayISO).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+    const todayEvents = S.events.filter(e=>e.date===todayISO).sort((a,b)=>{
+       if(a.allDay && !b.allDay) return -1; if(!a.allDay && b.allDay) return 1; return (a.time||'').localeCompare(b.time||'');
+    });
     if(!todayEvents.length) dash.innerHTML='<div style="color:var(--muted);font-size:0.8rem">Nothing scheduled today</div>';
     else todayEvents.forEach(ev=>dash.appendChild(makeEventEl(ev,true)));
   } catch(e) { console.error("Event Render Crash: ", e); document.getElementById('eventList').innerHTML = `<div style="color:var(--danger); padding:10px; font-size:0.7rem;">Crash rendering events: ${e.message}</div>`; }
@@ -1214,24 +1302,41 @@ function updateStats(){
       if(document.getElementById('pct2')) document.getElementById('pct2').textContent = pct2+'%'; 
     }
     
-    if(p1El) p1El.textContent = S.pts1; if(p2El) p2El.textContent = S.pts2;
+    if(p1El) p1El.textContent = S.pts1; 
+    if(p2El) p2El.textContent = S.pts2;
     
     const bar1 = document.getElementById('barp1');
-    if(bar1) { const t = Math.abs(S.pts1)+Math.abs(S.pts2)||1; bar1.style.width = Math.round(Math.abs(S.pts1)/t*100)+'%'; }
+    if(bar1) {
+      const t = Math.abs(S.pts1)+Math.abs(S.pts2)||1; 
+      bar1.style.width = Math.round(Math.abs(S.pts1)/t*100)+'%';
+    }
     
     const dashNotifs = document.getElementById('dashNotifs');
     if(dashNotifs) {
       dashNotifs.innerHTML = '';
       const p1Awaiting = S.habits.filter(h => (h.who==='p1' || h.who==='both') && h.d1 === 1 && !h.deletedAt).length;
       const p2Awaiting = S.habits.filter(h => (h.who==='p2' || h.who==='both') && h.d2 === 1 && !h.deletedAt).length;
+      
       let notifHtml = '';
       if(p1Awaiting > 0) notifHtml += `<div class="app-alert"><span>⏳</span> <div>${n1()} has ${p1Awaiting} quest(s) awaiting approval!</div></div>`;
       if(p2Awaiting > 0) notifHtml += `<div class="app-alert"><span>⏳</span> <div>${n2()} has ${p2Awaiting} quest(s) awaiting approval!</div></div>`;
       dashNotifs.innerHTML = notifHtml;
     }
-  } catch (e) { console.error("Stat render error ignored: " + e.message); }
+  } catch (e) {
+    console.error("Stat render error ignored: " + e.message);
+  }
 }
-function renderAll(){ updateStats(); renderWorkStrip(); renderQuests(); renderRewards(); renderEventList(); }
+
+function renderAll(){ 
+   updateStats(); 
+   renderWorkStrip(); 
+   renderQuests(); 
+   renderRewards(); 
+   renderEventList(); 
+   renderCountdown();
+   renderIntentions();
+}
+
 document.getElementById('name1').addEventListener('change',save); document.getElementById('name2').addEventListener('change',save);
 renderAll(); renderCalendar();
 </script>
