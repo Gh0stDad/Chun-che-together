@@ -201,7 +201,7 @@ section.active { display:block; }
 <div class="app">
 
 <header>
-  <div style="position:absolute; top:12px; right:14px; font-size:0.6rem; color:var(--muted2); font-family:monospace; font-weight:600;">v23</div>
+  <div style="position:absolute; top:12px; right:14px; font-size:0.6rem; color:var(--muted2); font-family:monospace; font-weight:600;">v24</div>
   <div class="logo">us <span>🤎</span></div>
   <div class="hdate" id="hdate"></div>
   <div class="streak">🔥 <span id="streakN">0</span> day streak</div>
@@ -335,6 +335,14 @@ section.active { display:block; }
     <div class="pen-color" style="background:#d4a96a" data-c="#d4a96a"></div>
     <div class="pen-color" style="background:#e07878" data-c="#e07878" title="Red"></div>
     <div class="pen-color" style="background:#e07878" data-c="#e07878"></div>
+    <div class="pen-color" style="background:#e67e22" data-c="#e67e22" title="Orange"></div>
+    <div class="pen-color" style="background:#e67e22" data-c="#e67e22"></div>
+    <div class="pen-color" style="background:#f1c40f" data-c="#f1c40f" title="Yellow"></div>
+    <div class="pen-color" style="background:#f1c40f" data-c="#f1c40f"></div>
+    <div class="pen-color" style="background:#2c3e50" data-c="#2c3e50" title="Navy"></div>
+    <div class="pen-color" style="background:#2c3e50" data-c="#2c3e50"></div>
+    <div class="pen-color" style="background:#7f8c8d" data-c="#7f8c8d" title="Dark Gray"></div>
+    <div class="pen-color" style="background:#7f8c8d" data-c="#7f8c8d"></div>
     <div style="flex:1"></div>
     <button class="tool-btn active" id="btnToolPen" onclick="setBoardTool('pen')">🖌️</button>
     <button class="tool-btn" id="btnToolFill" onclick="setBoardTool('fill')">🪣</button>
@@ -558,7 +566,7 @@ const P2_WORK = { 1:{start:'10:30',end:'19:00'}, 2:{start:'10:30',end:'19:00'}, 
 const DAYS3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 let S = deepClone(DEFAULT);
-const saved = localStorage.getItem('ct23'); 
+const saved = localStorage.getItem('ct24'); 
 if(saved){ try{ S = {...S, ...JSON.parse(saved)}; }catch(e){} }
 
 if(!S.habits) S.habits = []; if(!S.events) S.events = []; if(!S.rewards) S.rewards = [];
@@ -598,7 +606,7 @@ document.getElementById('hdate').textContent = now.toLocaleDateString('en-US',{w
 document.getElementById('boardText').value = S.boardText || '';
 
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
-function save(){ localStorage.setItem('ct23', JSON.stringify(S)); }
+function save(){ localStorage.setItem('ct24', JSON.stringify(S)); }
 function n1(){ return document.getElementById('name1').value||'Rebecca'; }
 function n2(){ return document.getElementById('name2').value||'Marius'; }
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2400); }
@@ -736,6 +744,8 @@ function addOverride() {
 }
 function deleteOverride(id) { S.scheduleOverrides = S.scheduleOverrides.filter(o => o.id !== id); save(); renderAll(); toast('Override Removed'); }
 
+function fmt12(t){ if(!t) return ''; const [h,m] = t.split(':'); const hr = parseInt(h); return `${hr>12?hr-12:hr||12}:${m}${hr>=12?'pm':'am'}`; }
+
 function renderWorkStrip(){
   const el = document.getElementById('workStrip'); el.innerHTML = ''; 
   const todayDow = now.getDay(); const dowAdjust = todayDow === 0 ? 6 : todayDow - 1; 
@@ -852,7 +862,8 @@ function addInlineSub(hid, parentSid) {
   if (!inp || !inp.value.trim()) return;
   const h = S.habits.find(x => x.id === hid); if(!h) return;
   const s = h.subtasks.find(x => x.id === parentSid); if(!s) return;
-  if (!s.subs) s.subs = []; s.subs.push({ id: Date.now(), text: inp.value.trim(), done: false });
+  if (!s.subs) s.subs = [];
+  s.subs.push({ id: Date.now(), text: inp.value.trim(), done: false });
   inp.value = ''; save(); renderAll();
 }
 
@@ -910,10 +921,21 @@ function makeQuestEl(h){
       </div>
       ${subsTotal > 0 ? `<div class="subtasks-container" id="qsub-${h.id}">
         ${h.subtasks.map((s) => `
-          <div class="sub-item"><div class="sub-chk ${s.done ? 'done' : ''}" onclick="toggleSub(${h.id}, ${s.id})">${s.done ? '✓' : ''}</div><span style="text-decoration: ${s.done ? 'line-through' : 'none'};">${s.text}</span></div>
+          <div class="sub-item">
+            <div class="sub-chk ${s.done ? 'done' : ''}" onclick="toggleSub(${h.id}, ${s.id})">${s.done ? '✓' : ''}</div>
+            <span style="text-decoration: ${s.done ? 'line-through' : 'none'};">${s.text}</span>
+          </div>
           <div style="margin-left: 24px; margin-bottom:8px; display: ${s.done ? 'none' : 'block'}; border-left:1px solid var(--border); padding-left:8px;">
-            ${(s.subs || []).map((ss) => `<div class="sub-item"><div class="sub-chk ${ss.done ? 'done' : ''}" onclick="toggleSubSub(${h.id}, ${s.id}, ${ss.id})">${ss.done ? '✓' : ''}</div><span style="text-decoration: ${ss.done ? 'line-through' : 'none'}; font-size:0.7rem;">${ss.text}</span></div>`).join('')}
-            <div class="step-input-row" style="margin-top:2px;"><input type="text" id="inline-sub-${h.id}-${s.id}" placeholder="Sub-task..." style="padding:4px 8px; font-size:0.65rem;"><button class="step-add-btn" style="padding:4px 8px; font-size:0.65rem;" onclick="addInlineSub(${h.id}, ${s.id})">Add</button></div>
+            ${(s.subs || []).map((ss) => `
+                <div class="sub-item">
+                    <div class="sub-chk ${ss.done ? 'done' : ''}" onclick="toggleSubSub(${h.id}, ${s.id}, ${ss.id})">${ss.done ? '✓' : ''}</div>
+                    <span style="text-decoration: ${ss.done ? 'line-through' : 'none'}; font-size:0.7rem;">${ss.text}</span>
+                </div>
+            `).join('')}
+            <div class="step-input-row" style="margin-top:2px;">
+               <input type="text" id="inline-sub-${h.id}-${s.id}" placeholder="Sub-task..." style="padding:4px 8px; font-size:0.65rem;">
+               <button class="step-add-btn" style="padding:4px 8px; font-size:0.65rem;" onclick="addInlineSub(${h.id}, ${s.id})">Add</button>
+            </div>
           </div>
         `).join('')}
       </div>` : ''}
@@ -1035,8 +1057,28 @@ function processIntimacyPoints(eid, silent = false) {
 }
 
 let calYear = now.getFullYear(), calMonth2 = now.getMonth();
-function calPrev(){ calMonth2--; if(calMonth2<0){calMonth2=11;calYear--;} renderCalendar(); renderEventList(); }
-function calNext(){ calMonth2++; if(calMonth2>11){calMonth2=0;calYear++;} renderCalendar(); renderEventList(); }
+
+// V24 FIX: Context-aware navigation
+function calPrev(){ 
+  if(viewMode === 'week') {
+    let d = new Date(selDate+'T12:00:00'); d.setDate(d.getDate()-7); selDate = d.toISOString().slice(0,10);
+  } else if(viewMode === 'day') {
+    let d = new Date(selDate+'T12:00:00'); d.setDate(d.getDate()-1); selDate = d.toISOString().slice(0,10);
+  } else {
+    calMonth2--; if(calMonth2<0){calMonth2=11;calYear--;} 
+  }
+  renderCalendar(); renderEventList(); 
+}
+function calNext(){ 
+  if(viewMode === 'week') {
+    let d = new Date(selDate+'T12:00:00'); d.setDate(d.getDate()+7); selDate = d.toISOString().slice(0,10);
+  } else if(viewMode === 'day') {
+    let d = new Date(selDate+'T12:00:00'); d.setDate(d.getDate()+1); selDate = d.toISOString().slice(0,10);
+  } else {
+    calMonth2++; if(calMonth2>11){calMonth2=0;calYear++;} 
+  }
+  renderCalendar(); renderEventList(); 
+}
 
 function renderCalendar(){
   const grid = document.getElementById('calGrid'); grid.innerHTML='';
@@ -1044,9 +1086,16 @@ function renderCalendar(){
   if (viewMode === 'month' || viewMode === 'week') {
     grid.style.display = 'grid'; grid.style.gridTemplateColumns = 'repeat(7,1fr)'; navControls.style.display = 'flex'; legend.style.display = 'flex'; headerControls.style.display = 'flex'; DAYS3.forEach(d=>{ const el=document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el); });
   } else { grid.style.display = 'block'; navControls.style.display = 'none'; legend.style.display = 'none'; headerControls.style.display = 'none'; }
+  
+  // V24 FIX: Synchronize month title with selected date when in week/day mode
+  let refDate = new Date(selDate + 'T12:00:00');
+  if (viewMode === 'week' || viewMode === 'day') {
+     calMonth2 = refDate.getMonth();
+     calYear = refDate.getFullYear();
+  }
   document.getElementById('calMonth').textContent = `${['January','February','March','April','May','June','July','August','September','October','November','December'][calMonth2]} ${calYear}`;
 
-  let cells = []; const refDate = new Date(selDate + 'T12:00:00');
+  let cells = []; 
   if (viewMode === 'month') {
     const daysInMonth = new Date(calYear,calMonth2+1,0).getDate(); const startDow = new Date(calYear,calMonth2,1).getDay();
     for(let i=startDow-1;i>=0;i--) cells.push({d:new Date(calYear,calMonth2,0).getDate()-i,month:calMonth2-1,year:calYear,other:true});
