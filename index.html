@@ -62,17 +62,13 @@ section.active { display:block; }
 .p1 .ring-fill { stroke:var(--p1); }
 .p2 .ring-fill { stroke:var(--p2); }
 .ring-pct { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:600; }
-.ppts { font-family:var(--font-d); font-size:1.9rem; font-weight:600; line-height:1; }
+.ppts { font-family:var(--font-d); font-size:1.9rem; font-weight:600; line-height:1; transition: color 0.3s; }
 .p1 .ppts { color:var(--p1); }
 .p2 .ppts { color:var(--p2); }
+.ppts.debt { color:var(--danger) !important; text-shadow: 0 0 8px rgba(224,120,120,0.5); }
 .ppts-lbl { font-size:0.6rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:2px; }
-.shared-card { background:var(--card); border-radius:var(--radius); padding:14px; border:1px solid var(--border); margin-bottom:14px; }
-.shared-lbl { display:flex; justify-content:space-between; font-size:0.7rem; color:var(--muted); margin-bottom:8px; }
-.shared-bar { height:7px; background:var(--border); border-radius:4px; overflow:hidden; position:relative; }
-.sbar-p1 { position:absolute; left:0; top:0; height:100%; background:var(--p1); border-radius:4px; transition:width 0.6s ease; }
-.sbar-p2 { position:absolute; right:0; top:0; height:100%; background:var(--p2); border-radius:4px; transition:width 0.6s ease; }
 
-/* ── QUESTS TAB (V10 Redesign) ── */
+/* ── QUESTS TAB (V11 Redesign) ── */
 .q-coop-sec { margin-bottom:16px; }
 .q-split-sec { display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:start; }
 .q-col { display:flex; flex-direction:column; gap:6px; }
@@ -80,10 +76,13 @@ section.active { display:block; }
 .q-subheader { font-size:0.65rem; color:var(--muted); margin-top:8px; text-transform:uppercase; text-align:center; }
 .q-item { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px; display:flex; flex-direction:column; gap:8px; position:relative; }
 .q-item.coop { flex-direction:row; align-items:center; justify-content:space-between; }
-.q-title { font-size:0.8rem; font-weight:500; line-height:1.2; }
+.q-item.directive { border-color:rgba(212,169,106,0.4); background:linear-gradient(145deg, var(--card), rgba(212,169,106,0.05)); }
+.q-title { font-size:0.8rem; font-weight:500; line-height:1.2; display:flex; align-items:center; gap:4px; }
 .q-pts { font-size:0.65rem; color:var(--gold); }
+.q-deadline { font-size:0.6rem; color:var(--danger); background:rgba(224,120,120,0.1); padding:2px 6px; border-radius:4px; margin-left:4px; }
 .q-actions { display:flex; justify-content:space-between; align-items:center; }
-.chk-btn { width:24px; height:24px; border-radius:6px; border:1.5px solid var(--border2); background:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:transparent; font-size:0.65rem; transition:all 0.2s; }
+
+.chk-btn { height:24px; min-width:24px; padding:0 6px; border-radius:6px; border:1.5px solid var(--border2); background:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:0.65rem; font-weight:600; transition:all 0.2s; }
 .chk-btn.awaiting { border-color:var(--warning); background:rgba(224,184,120,0.15); color:var(--warning); }
 .chk-btn.done { border-color:var(--success); background:rgba(126,202,160,0.15); color:var(--success); }
 .approve-btn { background:var(--sharedbg); color:var(--shared); border:1px solid var(--shared); border-radius:6px; font-size:0.65rem; padding:4px 8px; cursor:pointer; }
@@ -129,7 +128,6 @@ section.active { display:block; }
 .ev-body { flex:1; }
 .ev-title { font-size:0.85rem; font-weight:500; }
 .ev-who { font-size:0.65rem; color:var(--muted); margin-top:1px; }
-
 .med-item { background:var(--card2); border-radius:var(--radius-sm); padding:11px 12px; margin-bottom:6px; display:flex; align-items:center; gap:10px; border:1px solid var(--border2); border-left:3px solid var(--success); }
 .med-check { width:22px; height:22px; border-radius:6px; border:1.5px solid var(--border2); background:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:transparent; font-size:0.7rem; transition:all 0.2s; }
 .med-check.done { background:rgba(126, 202, 160, 0.15); border-color:var(--success); color:var(--success); }
@@ -143,16 +141,18 @@ section.active { display:block; }
 .pen-color.sel { border-color:var(--text); transform:scale(1.1); }
 #boardText { width:100%; min-height:100px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-b); font-size:0.85rem; padding:12px; resize:vertical; margin-top:14px; outline:none; }
 
-/* ── TRIBUTES ── */
-.rewards-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.reward-card { background:var(--card); border-radius:var(--radius); padding:14px 10px; border:1px solid var(--border); text-align:center; cursor:pointer; position:relative; }
-.reward-card.claimed { opacity:0.3; }
-.ricon { font-size:1.7rem; margin-bottom:5px; }
-.rtype { font-size:0.58rem; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:3px; }
-.type-reward { color:var(--success); } .type-punishment { color:var(--danger); }
-.rname { font-size:0.8rem; font-weight:500; margin-bottom:4px; }
-.rcost { font-size:0.7rem; color:var(--gold); font-weight:600; }
-.rdel { position:absolute; top:6px; right:8px; background:none; border:none; color:var(--muted); font-size:0.8rem; cursor:pointer; opacity:0.5; }
+/* ── TRIBUTES (EXCHANGE) ── */
+.rewards-grid { display:flex; flex-direction:column; gap:10px; }
+.reward-card { background:var(--card); border-radius:var(--radius); padding:14px; border:1px solid var(--border); display:flex; align-items:center; gap:12px; position:relative; }
+.ricon { font-size:2rem; width:44px; text-align:center; flex-shrink:0; }
+.rbody { flex:1; }
+.rname { font-size:0.9rem; font-weight:500; margin-bottom:2px; }
+.rcost { font-size:0.7rem; color:var(--gold); font-weight:600; margin-bottom:8px; }
+.raction-row { display:flex; gap:6px; }
+.ex-btn { flex:1; padding:6px 0; border-radius:6px; font-size:0.65rem; font-family:var(--font-b); font-weight:600; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; border:1px solid transparent; }
+.btn-claim { background:rgba(212,169,106,0.1); color:var(--gold); border-color:var(--gold); }
+.btn-offer { background:rgba(126,202,160,0.1); color:var(--success); border-color:var(--success); }
+.rdel { position:absolute; top:8px; right:10px; background:none; border:none; color:var(--muted); font-size:0.8rem; cursor:pointer; opacity:0.5; }
 
 /* ── MODALS ── */
 .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); z-index:500; align-items:flex-end; justify-content:center; }
@@ -208,10 +208,6 @@ section.active { display:block; }
       <div class="ring-wrap"><svg width="60" height="60" viewBox="0 0 60 60"><circle class="ring-bg" cx="30" cy="30" r="25"/><circle class="ring-fill" id="ring2" cx="30" cy="30" r="25" stroke-dasharray="157.08" stroke-dashoffset="157.08"/></svg><div class="ring-pct" id="pct2">0%</div></div>
       <div class="ppts" id="pts2">0</div><div class="ppts-lbl">points</div>
     </div>
-  </div>
-  <div class="shared-card">
-    <div class="shared-lbl"><span>Combined Power</span><span id="sharedPct">0%</span></div>
-    <div class="shared-bar"><div class="sbar-p1" id="barp1"></div><div class="sbar-p2" id="barp2"></div></div>
   </div>
   
   <div class="sec-head"><div class="sec-title">Work Week & Meds</div></div>
@@ -297,8 +293,8 @@ section.active { display:block; }
 </section>
 
 <section id="sec-rewards">
-  <div class="sec-head"><div class="sec-title">Tributes</div><button class="sec-add" onclick="openModal('rewardModal')">+ Add Tribute</button></div>
-  <div style="font-size:0.75rem; color:var(--muted); margin-bottom:12px; text-align:center;">Assigning punishments generates mandatory Quests.</div>
+  <div class="sec-head"><div class="sec-title">The Exchange</div><button class="sec-add" onclick="openModal('rewardModal')">+ Add Item</button></div>
+  <div style="font-size:0.75rem; color:var(--muted); margin-bottom:12px; text-align:center;">Claiming deducts points and demands it from your partner.<br>Offering generates a Quest for you to earn points to clear Debt.</div>
   <div class="rewards-grid" id="rewardsGrid"></div>
 </section>
 
@@ -309,7 +305,7 @@ section.active { display:block; }
   <button onclick="showSec('habits',this)"><span class="ni">✅</span>Quests</button>
   <button onclick="showSec('schedule',this)"><span class="ni">📅</span>Dates</button>
   <button onclick="showSec('board',this)"><span class="ni">🖍️</span>Board</button>
-  <button onclick="showSec('rewards',this)"><span class="ni">🗝️</span>Tributes</button>
+  <button onclick="showSec('rewards',this)"><span class="ni">🗝️</span>Exchange</button>
 </nav>
 
 <div class="overlay" id="cycleModal">
@@ -352,11 +348,25 @@ section.active { display:block; }
     <div class="modal-title" id="hm-modal-title">New Quest</div>
     <input type="hidden" id="hm-id">
     <label>Task Name</label>
-    <input type="text" id="hm-name" placeholder="e.g. Server Admin / Grocery Run">
-    <div class="row2"><div><label>Category</label><select id="hm-cat"><option value="wellness">Wellness</option><option value="work">Work</option><option value="bonding">Bonding</option><option value="personal">Personal</option></select></div><div><label>Points</label><input type="number" id="hm-pts" value="20" min="1"></div></div>
-    <div class="row2"><div><label>Who?</label><select id="hm-who"><option value="both">Both</option><option value="p1">Rebecca</option><option value="p2">Marius</option></select></div><div><label>Frequency</label><select id="hm-freq"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="none">One-off Quest</option></select></div></div>
-    <label>Cross-Tab: Calendar Integration?</label>
+    <input type="text" id="hm-name" placeholder="e.g. Drink Water / Mop Floor">
+    <div class="row2">
+      <div><label>Assigned By</label><select id="hm-assigner"><option value="both">Mutual</option><option value="p1">Rebecca</option><option value="p2">Marius</option></select></div>
+      <div><label>Assigned To</label><select id="hm-who"><option value="both">Both</option><option value="p1">Rebecca</option><option value="p2">Marius</option></select></div>
+    </div>
+    <div class="row2">
+      <div><label>Frequency</label><select id="hm-freq"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="interval">Every 3 Days</option><option value="none">One-off Quest</option></select></div>
+      <div><label>Points Value</label><input type="number" id="hm-pts" value="20" min="1"></div>
+    </div>
+    
+    <label>Progress & Cooldown (Optional)</label>
+    <div class="row2">
+      <div><label>Target Count (e.g. 6)</label><input type="number" id="hm-count" value="1" min="1"></div>
+      <div><label>Cooldown (Mins)</label><input type="number" id="hm-cd" value="0" min="0"></div>
+    </div>
+
+    <label>Deadline & Calendar Link (Optional)</label>
     <div class="row2"><div><input type="date" id="hm-date"></div><div><input type="time" id="hm-time"></div></div>
+    
     <label>Add Subtasks (optional)</label>
     <div class="step-input-row"><input type="text" id="hm-sub-input" placeholder="e.g. No onions on burgers"><button class="step-add-btn" onclick="addSubtask()">+ Add</button></div>
     <div class="steps-preview" id="subPreview"></div>
@@ -385,13 +395,11 @@ section.active { display:block; }
 
 <div class="overlay" id="rewardModal">
   <div class="modal">
-    <div class="modal-title">New Tribute / Protocol</div>
+    <div class="modal-title">Add to Exchange</div>
     <label>Name</label>
-    <input type="text" id="rm-name" placeholder="e.g. Choose the movie">
-    <div class="row2"><div><label>Emoji Icon</label><input type="text" id="rm-icon" placeholder="🎬" maxlength="2"></div><div><label>Point Cost</label><input type="number" id="rm-cost" value="50" min="1"></div></div>
-    <label>Type</label>
-    <select id="rm-type"><option value="reward">Reward 🎁</option><option value="punishment">Punishment (Creates Quest) 😬</option></select>
-    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('rewardModal')">Cancel</button><button class="btn btn-primary" onclick="addReward()">Add Tribute</button></div>
+    <input type="text" id="rm-name" placeholder="e.g. Cunnilingus / Mop Floor">
+    <div class="row2"><div><label>Emoji Icon</label><input type="text" id="rm-icon" placeholder="👅" maxlength="2"></div><div><label>Point Value</label><input type="number" id="rm-cost" value="100" min="1"></div></div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('rewardModal')">Cancel</button><button class="btn btn-primary" onclick="addReward()">Add Item</button></div>
   </div>
 </div>
 
@@ -408,12 +416,9 @@ section.active { display:block; }
 const DEFAULT = {
   pts1: 0, pts2: 0, streak: 0,
   cycle: { periodStarts: [], dailyLogs: {}, defaultCycleLen: 28, defaultPeriodLen: 5, lutealPhase: 14 },
-  habits: [
-    { id: 1, name: 'Remote Deep Work / Server Admin', cat: 'work', pts: 20, who: 'p2', d1: 0, d2: 0, freq: 'daily', subtasks: [{ id: 101, text: 'Review Conan Exiles server logs', done: false }], deletedAt: null },
-    { id: 2, name: 'Virtual Date / Sync Screen', cat: 'bonding', pts: 50, who: 'both', d1: 0, d2: 0, freq: 'weekly', subtasks: [], deletedAt: null }
-  ],
-  events: [ {id: 1, title: 'Botanical Wine Tour Prep', date: '2026-05-15', time: '17:00', who: 'p2', color: '#b09cda', isIntimacy: false} ],
-  rewards: [ {id: 1, name: 'Choose the movie', icon: '🎬', type: 'reward', cost: 100, claimed: false}, {id: 2, name: 'Keanu Custodial Duty', icon: '🐕', type: 'punishment', cost: 50, claimed: false} ],
+  habits: [],
+  events: [],
+  rewards: [ {id: 1, name: 'Cunnilingus', icon: '👅', cost: 100}, {id: 2, name: 'Mop the Floor', icon: '🧹', cost: 50} ],
   medsCheck: {}, boardImage: '', boardText: '', lastReset: '', selectedColor: '#b09cda'
 };
 
@@ -422,15 +427,9 @@ const P2_WORK = { 1:{start:'10:30',end:'19:00'}, 2:{start:'10:30',end:'19:00'}, 
 const DAYS3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 let S = deepClone(DEFAULT);
-const saved = localStorage.getItem('ct10'); 
+const saved = localStorage.getItem('ct11'); 
 if(saved){ try{ S = {...S, ...JSON.parse(saved)}; }catch(e){} }
 if(!S.medsCheck) S.medsCheck = {};
-
-// Migrate legacy booleans to 0/1/2 logic
-S.habits.forEach(h => {
-  if (h.d1 === true) h.d1 = 2; else if (h.d1 === false) h.d1 = 0;
-  if (h.d2 === true) h.d2 = 2; else if (h.d2 === false) h.d2 = 0;
-});
 
 const now = new Date();
 const todayISO = now.toISOString().slice(0,10);
@@ -438,15 +437,30 @@ let selDate = todayISO;
 let tempSubtasks = [];
 let viewMode = 'month';
 
-// Nightly Reset Logic & Delete Log cleanup
+// ── Nightly Reset & Debt Deduction Logic ──
 if(S.lastReset !== todayISO){
   const isMonday = now.getDay() === 1;
   S.habits.forEach(h => {
-    if(h.freq === 'daily' || (h.freq === 'weekly' && isMonday)) { h.d1 = 0; h.d2 = 0; if(h.subtasks) h.subtasks.forEach(s => s.done = false); }
+    let shouldReset = false;
+    if (h.freq === 'daily') shouldReset = true;
+    if (h.freq === 'weekly' && isMonday) shouldReset = true;
+    if (h.freq === 'interval' && h.lastDoneDate) {
+      if ((now - new Date(h.lastDoneDate)) > 3 * 86400000) shouldReset = true;
+    }
+    
+    if(shouldReset) { 
+      // Debt Deduction for missed tasks
+      let p1Fail = (h.who === 'p1' || h.who === 'both') && h.d1 !== 2;
+      let p2Fail = (h.who === 'p2' || h.who === 'both') && h.d2 !== 2;
+      if(p1Fail) S.pts1 -= h.pts; 
+      if(p2Fail) S.pts2 -= h.pts; 
+
+      h.d1 = 0; h.d2 = 0; h.c1 = 0; h.c2 = 0; h.lastT1 = 0; h.lastT2 = 0; 
+      if(h.subtasks) h.subtasks.forEach(s => s.done = false); 
+    }
   });
   S.boardImage = ''; S.boardText = ''; 
   S.lastReset = todayISO; 
-  // Purge quests deleted > 24 hours ago
   S.habits = S.habits.filter(h => !h.deletedAt || (Date.now() - h.deletedAt < 86400000));
   save();
 }
@@ -455,7 +469,7 @@ document.getElementById('hdate').textContent = now.toLocaleDateString('en-US',{w
 document.getElementById('boardText').value = S.boardText || '';
 
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
-function save(){ localStorage.setItem('ct10', JSON.stringify(S)); }
+function save(){ localStorage.setItem('ct11', JSON.stringify(S)); }
 function n1(){ return document.getElementById('name1').value||'Rebecca'; }
 function n2(){ return document.getElementById('name2').value||'Marius'; }
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2400); }
@@ -559,7 +573,7 @@ function getCyclePhase(targetDateStr) {
 }
 
 // ═══════════════════════════════════
-// QUESTS (V10)
+// QUESTS (V11)
 // ═══════════════════════════════════
 function renderSubPreview() { document.getElementById('subPreview').innerHTML = tempSubtasks.map((s,i) => `<div class="step-preview-item"><span>${s.text}</span><button onclick="tempSubtasks.splice(${i},1); renderSubPreview();" style="background:none;border:none;color:var(--danger);cursor:pointer;">✕</button></div>`).join(''); }
 function addSubtask(){ const inp = document.getElementById('hm-sub-input'); if(!inp.value.trim()) return; tempSubtasks.push({ id: Date.now(), text: inp.value.trim(), done: false }); inp.value = ''; renderSubPreview(); }
@@ -569,11 +583,11 @@ function openHabitModal(hid = null) {
   if(hid) {
     const h = S.habits.find(x => x.id === hid);
     document.getElementById('hm-modal-title').textContent = "Edit Quest";
-    el.value = h.id; document.getElementById('hm-name').value = h.name; document.getElementById('hm-cat').value = h.cat; document.getElementById('hm-pts').value = h.pts; document.getElementById('hm-who').value = h.who; document.getElementById('hm-freq').value = h.freq || 'none'; document.getElementById('hm-date').value = h.date || '';
+    el.value = h.id; document.getElementById('hm-name').value = h.name; document.getElementById('hm-cat').value = h.cat; document.getElementById('hm-pts').value = h.pts; document.getElementById('hm-who').value = h.who; document.getElementById('hm-assigner').value = h.assignedBy || 'both'; document.getElementById('hm-freq').value = h.freq || 'none'; document.getElementById('hm-date').value = h.date || ''; document.getElementById('hm-time').value = h.time || ''; document.getElementById('hm-count').value = h.maxCount || 1; document.getElementById('hm-cd').value = h.cdMins || 0;
     tempSubtasks = deepClone(h.subtasks || []);
   } else {
     document.getElementById('hm-modal-title').textContent = "New Quest";
-    el.value = ''; document.getElementById('hm-name').value = ''; document.getElementById('hm-pts').value = 20; document.getElementById('hm-date').value = ''; tempSubtasks = [];
+    el.value = ''; document.getElementById('hm-name').value = ''; document.getElementById('hm-pts').value = 20; document.getElementById('hm-date').value = ''; document.getElementById('hm-time').value = ''; document.getElementById('hm-count').value = 1; document.getElementById('hm-cd').value = 0; tempSubtasks = [];
   }
   renderSubPreview(); openModal('habitModal');
 }
@@ -582,42 +596,60 @@ function addHabit(){
   const name = document.getElementById('hm-name').value.trim(); const date = document.getElementById('hm-date').value; const time = document.getElementById('hm-time').value;
   if(!name) return;
   const id = document.getElementById('hm-id').value;
-  const data = { name, cat: document.getElementById('hm-cat').value, freq: document.getElementById('hm-freq').value, pts: parseInt(document.getElementById('hm-pts').value)||20, who: document.getElementById('hm-who').value, subtasks: [...tempSubtasks], date: date || null };
+  const data = { name, cat: document.getElementById('hm-cat').value, assignedBy: document.getElementById('hm-assigner').value, freq: document.getElementById('hm-freq').value, pts: parseInt(document.getElementById('hm-pts').value)||20, who: document.getElementById('hm-who').value, subtasks: [...tempSubtasks], date: date || null, time: time || null, maxCount: parseInt(document.getElementById('hm-count').value)||1, cdMins: parseInt(document.getElementById('hm-cd').value)||0 };
+  
   if(id) { const h = S.habits.find(x => x.id == id); if(h) Object.assign(h, data); toast('Quest Updated'); } 
-  else { S.habits.push({ id: Date.now(), d1: 0, d2: 0, deletedAt: null, ...data }); if(date) S.events.push({ id: Date.now()+1, title: `Quest: ${name}`, date: date, time: time || '12:00', who: data.who, color: '#d4a96a' }); toast('Quest Added 🎯'); }
+  else { S.habits.push({ id: Date.now(), d1: 0, d2: 0, c1: 0, c2: 0, lastT1: 0, lastT2: 0, deletedAt: null, ...data }); if(date) S.events.push({ id: Date.now()+1, title: `Quest: ${name}`, date: date, time: time || '12:00', who: data.who, color: '#d4a96a' }); toast('Quest Added 🎯'); }
   document.getElementById('hm-date').value=''; document.getElementById('hm-time').value=''; save(); closeModal('habitModal'); renderAll(); 
 }
 
 function makeQuestEl(h){
-  if (h.deletedAt) {
-    return `<div class="deleted-quest">Deleted by ${h.who==='p1'?n1():n2()}</div>`;
-  }
+  if (h.deletedAt) return `<div class="deleted-quest">Deleted by ${h.who==='p1'?n1():n2()}</div>`;
 
-  const isCoop = h.who === 'both';
-  const showP1 = h.who !== 'p2';
-  const showP2 = h.who !== 'p1';
+  const isCoop = h.who === 'both'; const showP1 = h.who !== 'p2'; const showP2 = h.who !== 'p1';
   const subsTotal = h.subtasks ? h.subtasks.length : 0; const subsDone = h.subtasks ? h.subtasks.filter(s => s.done).length : 0;
   
-  let p1State = h.d1; let p2State = h.d2;
+  // Directive Visuals (Assigned by someone else)
+  let directiveClass = ''; let directiveIcon = '';
+  if (h.assignedBy !== h.who && h.assignedBy !== 'both' && h.who !== 'both') {
+    directiveClass = 'directive'; directiveIcon = '🗝️ ';
+  }
+
   let actionsHtml = '';
   
   if (showP1) {
-    if (p1State === 0) actionsHtml += `<button class="chk-btn" onclick="toggleQuest(${h.id}, 1)">${n1().slice(0,1)}</button>`;
-    if (p1State === 1) actionsHtml += `<button class="chk-btn awaiting" onclick="toggleQuest(${h.id}, 1)">${n1().slice(0,1)}</button> <button class="approve-btn" onclick="approveQuest(${h.id}, 1)">Approve</button>`;
-    if (p1State === 2) actionsHtml += `<button class="chk-btn done" onclick="toggleQuest(${h.id}, 1)">✓</button>`;
+    if (h.maxCount > 1) {
+      if (h.d1 === 2) actionsHtml += `<button class="chk-btn done">✓</button>`;
+      else if (h.d1 === 1) actionsHtml += `<button class="chk-btn awaiting">${h.c1}/${h.maxCount}</button> <button class="approve-btn" onclick="approveQuest(${h.id}, 1)">Approve</button>`;
+      else actionsHtml += `<button class="chk-btn" onclick="progressQuest(${h.id}, 1)" style="width:auto; padding:0 8px;">${h.c1}/${h.maxCount}</button>`;
+    } else {
+      if (h.d1 === 0) actionsHtml += `<button class="chk-btn" onclick="progressQuest(${h.id}, 1)">${n1().slice(0,1)}</button>`;
+      else if (h.d1 === 1) actionsHtml += `<button class="chk-btn awaiting" onclick="progressQuest(${h.id}, 1)">${n1().slice(0,1)}</button> <button class="approve-btn" onclick="approveQuest(${h.id}, 1)">Approve</button>`;
+      else if (h.d1 === 2) actionsHtml += `<button class="chk-btn done" onclick="progressQuest(${h.id}, 1)">✓</button>`;
+    }
   }
+  
   if (showP2) {
-    if (p2State === 0) actionsHtml += `<button class="chk-btn" onclick="toggleQuest(${h.id}, 2)">${n2().slice(0,1)}</button>`;
-    if (p2State === 1) actionsHtml += `<button class="chk-btn awaiting" onclick="toggleQuest(${h.id}, 2)">${n2().slice(0,1)}</button> <button class="approve-btn" onclick="approveQuest(${h.id}, 2)">Approve</button>`;
-    if (p2State === 2) actionsHtml += `<button class="chk-btn done" onclick="toggleQuest(${h.id}, 2)">✓</button>`;
+    if (h.maxCount > 1) {
+      if (h.d2 === 2) actionsHtml += `<button class="chk-btn done">✓</button>`;
+      else if (h.d2 === 1) actionsHtml += `<button class="chk-btn awaiting">${h.c2}/${h.maxCount}</button> <button class="approve-btn" onclick="approveQuest(${h.id}, 2)">Approve</button>`;
+      else actionsHtml += `<button class="chk-btn" onclick="progressQuest(${h.id}, 2)" style="width:auto; padding:0 8px;">${h.c2}/${h.maxCount}</button>`;
+    } else {
+      if (h.d2 === 0) actionsHtml += `<button class="chk-btn" onclick="progressQuest(${h.id}, 2)">${n2().slice(0,1)}</button>`;
+      else if (h.d2 === 1) actionsHtml += `<button class="chk-btn awaiting" onclick="progressQuest(${h.id}, 2)">${n2().slice(0,1)}</button> <button class="approve-btn" onclick="approveQuest(${h.id}, 2)">Approve</button>`;
+      else if (h.d2 === 2) actionsHtml += `<button class="chk-btn done" onclick="progressQuest(${h.id}, 2)">✓</button>`;
+    }
   }
 
-  let html = `
-    <div class="q-item ${isCoop?'coop':''}">
+  let deadlineHtml = '';
+  if (h.time && h.freq !== 'none') deadlineHtml = `<span class="q-deadline">by ${fmt12(h.time)}</span>`;
+
+  return `
+    <div class="q-item ${isCoop?'coop':''} ${directiveClass}">
       <div style="flex:1;">
-        <div class="q-title">${h.name}</div>
+        <div class="q-title">${directiveIcon}${h.name}</div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-          <span class="q-pts cat-${h.cat}">+${h.pts} pts</span>
+          <span class="q-pts cat-${h.cat}">+${h.pts} pts ${deadlineHtml}</span>
           ${subsTotal > 0 ? `<button class="expand-btn" style="margin:0;" onclick="document.getElementById('qsub-${h.id}').classList.toggle('open')">▼ ${subsDone}/${subsTotal}</button>` : ''}
         </div>
       </div>
@@ -631,13 +663,29 @@ function makeQuestEl(h){
       ${subsTotal > 0 ? `<div class="subtasks-container" id="qsub-${h.id}">${h.subtasks.map((s,i) => `<div class="sub-item"><div class="sub-chk ${s.done ? 'done' : ''}" onclick="toggleSub(${h.id}, ${s.id})">${s.done ? '✓' : ''}</div><span style="text-decoration: ${s.done ? 'line-through' : 'none'};">${s.text}</span></div>`).join('')}</div>` : ''}
     </div>
   `;
-  return html;
 }
 
-function toggleQuest(id, player) {
+function progressQuest(id, player) {
   const h = S.habits.find(x => x.id === id);
-  if(player === 1) { h.d1 = h.d1 === 0 ? 1 : 0; }
-  else { h.d2 = h.d2 === 0 ? 1 : 0; }
+  const nowMs = Date.now();
+  
+  if(player === 1) {
+    if (h.d1 !== 0) { h.d1 = 0; h.c1 = 0; save(); renderAll(); return; } // undo
+    if (h.cdMins && h.lastT1 && (nowMs - h.lastT1) < (h.cdMins * 60000)) {
+       const rem = Math.ceil((h.cdMins * 60000 - (nowMs - h.lastT1))/60000);
+       return toast(`Cooldown! Wait ${rem} mins.`);
+    }
+    h.c1++; h.lastT1 = nowMs;
+    if(h.c1 >= (h.maxCount||1)) { h.d1 = 1; h.lastDoneDate = todayISO; }
+  } else {
+    if (h.d2 !== 0) { h.d2 = 0; h.c2 = 0; save(); renderAll(); return; } // undo
+    if (h.cdMins && h.lastT2 && (nowMs - h.lastT2) < (h.cdMins * 60000)) {
+       const rem = Math.ceil((h.cdMins * 60000 - (nowMs - h.lastT2))/60000);
+       return toast(`Cooldown! Wait ${rem} mins.`);
+    }
+    h.c2++; h.lastT2 = nowMs;
+    if(h.c2 >= (h.maxCount||1)) { h.d2 = 1; h.lastDoneDate = todayISO; }
+  }
   save(); renderAll();
 }
 
@@ -648,17 +696,8 @@ function approveQuest(id, player) {
   save(); renderAll();
 }
 
-function deleteQuest(id) {
-  const h = S.habits.find(x => x.id === id);
-  h.deletedAt = Date.now();
-  save(); renderAll();
-}
-
-function toggleSub(hid, sid) {
-  const h = S.habits.find(x => x.id === hid);
-  const s = h.subtasks.find(x => x.id === sid);
-  s.done = !s.done; save(); renderAll();
-}
+function deleteQuest(id) { const h = S.habits.find(x => x.id === id); h.deletedAt = Date.now(); save(); renderAll(); }
+function toggleSub(hid, sid) { const h = S.habits.find(x => x.id === hid); const s = h.subtasks.find(x => x.id === sid); s.done = !s.done; save(); renderAll(); }
 
 function renderQuests(){
   document.getElementById('hdr-name1').textContent = n1(); document.getElementById('hdr-name2').textContent = n2();
@@ -666,7 +705,7 @@ function renderQuests(){
   cList.innerHTML=''; p1Today.innerHTML=''; p1Backlog.innerHTML=''; p2Today.innerHTML=''; p2Backlog.innerHTML='';
 
   S.habits.forEach(h => {
-    const isToday = h.freq === 'daily' || h.freq === 'weekly' || (h.date && h.date === todayISO);
+    const isToday = h.freq !== 'none' || (h.date && h.date === todayISO) || (h.deletedAt);
     const html = makeQuestEl(h);
     if(h.who === 'both') { cList.innerHTML += html; return; }
     if(h.who === 'p1') { isToday ? p1Today.innerHTML += html : p1Backlog.innerHTML += html; }
@@ -711,19 +750,12 @@ function calNext(){ calMonth2++; if(calMonth2>11){calMonth2=0;calYear++;} render
 function renderCalendar(){
   const grid = document.getElementById('calGrid'); grid.innerHTML='';
   const navControls = document.getElementById('calNavControls'); const legend = document.getElementById('calLegend'); const headerControls = document.getElementById('calHeaderControls');
-  
   if (viewMode === 'month' || viewMode === 'week') {
-    grid.style.display = 'grid'; grid.style.gridTemplateColumns = 'repeat(7,1fr)';
-    navControls.style.display = 'flex'; legend.style.display = 'flex'; headerControls.style.display = 'flex';
-    DAYS3.forEach(d=>{ const el=document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el); });
-  } else { 
-    grid.style.display = 'block'; navControls.style.display = 'none'; legend.style.display = 'none'; headerControls.style.display = 'none';
-  }
-  
+    grid.style.display = 'grid'; grid.style.gridTemplateColumns = 'repeat(7,1fr)'; navControls.style.display = 'flex'; legend.style.display = 'flex'; headerControls.style.display = 'flex'; DAYS3.forEach(d=>{ const el=document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el); });
+  } else { grid.style.display = 'block'; navControls.style.display = 'none'; legend.style.display = 'none'; headerControls.style.display = 'none'; }
   document.getElementById('calMonth').textContent = `${['January','February','March','April','May','June','July','August','September','October','November','December'][calMonth2]} ${calYear}`;
 
   let cells = []; const refDate = new Date(selDate + 'T12:00:00');
-  
   if (viewMode === 'month') {
     const daysInMonth = new Date(calYear,calMonth2+1,0).getDate(); const startDow = new Date(calYear,calMonth2,1).getDay();
     for(let i=startDow-1;i>=0;i--) cells.push({d:new Date(calYear,calMonth2,0).getDate()-i,month:calMonth2-1,year:calYear,other:true});
@@ -737,22 +769,13 @@ function renderCalendar(){
   if (viewMode === 'month' || viewMode === 'week') {
     cells.forEach(c=>{
       const dateStr = `${c.year}-${String(c.month+1).padStart(2,'0')}-${String(c.d).padStart(2,'0')}`;
-      const cycleData = getCyclePhase(dateStr); const logData = S.cycle.dailyLogs[dateStr];
-      const eventsOnDay = S.events.filter(e => e.date === dateStr).sort((a,b)=>a.time.localeCompare(b.time));
-      
-      const cell = document.createElement('div');
-      cell.className='cal-cell'+(c.other?' other-month':'')+(dateStr===todayISO?' today':'')+(dateStr===selDate?' selected':'');
+      const cycleData = getCyclePhase(dateStr); const logData = S.cycle.dailyLogs[dateStr]; const eventsOnDay = S.events.filter(e => e.date === dateStr).sort((a,b)=>a.time.localeCompare(b.time));
+      const cell = document.createElement('div'); cell.className='cal-cell'+(c.other?' other-month':'')+(dateStr===todayISO?' today':'')+(dateStr===selDate?' selected':'');
       if(cycleData && cycleData.phase !== 'default') cell.style.backgroundColor = cycleData.color;
-      
-      let iconsHtml = '';
-      if(cycleData && cycleData.icon) iconsHtml += `<span>${cycleData.icon}</span>`;
-      if(logData && logData.sex && logData.sex.length > 0) iconsHtml += `<span>🤍</span>`;
-      
+      let iconsHtml = ''; if(cycleData && cycleData.icon) iconsHtml += `<span>${cycleData.icon}</span>`; if(logData && logData.sex && logData.sex.length > 0) iconsHtml += `<span>🤍</span>`;
       const eventBarsHtml = eventsOnDay.map(e => viewMode === 'week' ? `<div class="cal-bar-text" style="background:${e.color};">${e.isIntimacy?'🤍 ':''}${e.title}</div>` : `<div class="cal-bar" style="background:${e.color};"></div>`).join('');
-      
       cell.innerHTML=`<div class="cal-log-icons">${iconsHtml}</div><span class="cal-num">${c.d}</span><div class="cal-bars">${eventBarsHtml}</div>`;
-      cell.addEventListener('click', () => { selDate = dateStr; viewMode = 'day'; renderCalendar(); renderEventList(); });
-      grid.appendChild(cell);
+      cell.addEventListener('click', () => { selDate = dateStr; viewMode = 'day'; renderCalendar(); renderEventList(); }); grid.appendChild(cell);
     });
   } else if (viewMode === 'day') {
     const cd = getCyclePhase(selDate); const log = S.cycle.dailyLogs[selDate];
@@ -764,23 +787,11 @@ function renderCalendar(){
         if(log.bbt) loggedItemsHtml += `<span style="background:var(--card2); color:var(--muted); padding:3px 8px; border-radius:12px; font-size:0.7rem; margin:2px;">🌡️ ${log.bbt}°</span>`;
         if(log.symp && log.symp.length > 0) loggedItemsHtml += `<div style="font-size:0.75rem; color:var(--muted); margin-top:8px;">Symptoms: ${log.symp.join(', ')}</div>`;
     }
-    grid.innerHTML = `
-      <div class="day-view-header">
-        <button class="day-view-back" onclick="viewMode='month'; renderCalendar(); renderEventList();">← Back</button>
-        <div style="font-family:var(--font-d); font-size:1.8rem; color:var(--shared); line-height:1.2;">${refDate.toLocaleDateString('en-US',{weekday:'long'})}</div>
-        <div style="font-size:0.9rem; color:var(--muted);">${refDate.toLocaleDateString('en-US',{month:'long', day:'numeric'})}</div>
-        ${cycleText}
-        <div style="display:flex; flex-wrap:wrap; justify-content:center; margin-top:8px;">${loggedItemsHtml}</div>
-      </div>
-    `;
+    grid.innerHTML = `<div class="day-view-header"><button class="day-view-back" onclick="viewMode='month'; renderCalendar(); renderEventList();">← Back</button><div style="font-family:var(--font-d); font-size:1.8rem; color:var(--shared); line-height:1.2;">${refDate.toLocaleDateString('en-US',{weekday:'long'})}</div><div style="font-size:0.9rem; color:var(--muted);">${refDate.toLocaleDateString('en-US',{month:'long', day:'numeric'})}</div>${cycleText}<div style="display:flex; flex-wrap:wrap; justify-content:center; margin-top:8px;">${loggedItemsHtml}</div></div>`;
   }
 }
 
-function toggleMed(dateStr, player) {
-  if(!S.medsCheck[dateStr]) S.medsCheck[dateStr] = {p1:false, p2:false};
-  S.medsCheck[dateStr][player] = !S.medsCheck[dateStr][player];
-  save(); renderEventList();
-}
+function toggleMed(dateStr, player) { if(!S.medsCheck[dateStr]) S.medsCheck[dateStr] = {p1:false, p2:false}; S.medsCheck[dateStr][player] = !S.medsCheck[dateStr][player]; save(); renderEventList(); }
 
 function makeEventEl(ev, compact){
   const whoLabel = ev.who==='both'?`${n1()} & ${n2()}`:ev.who==='p1'?n1():n2();
@@ -792,19 +803,14 @@ function makeEventEl(ev, compact){
 function renderEventList(){
   const el = document.getElementById('eventList'); el.innerHTML='';
   const selEvents = S.events.filter(e=>e.date===selDate).sort((a,b)=>a.time.localeCompare(b.time));
-  
-  const targetDow = new Date(selDate + 'T12:00:00').getDay();
-  const w1 = P1_WORK[targetDow], w2 = P2_WORK[targetDow];
+  const targetDow = new Date(selDate + 'T12:00:00').getDay(); const w1 = P1_WORK[targetDow], w2 = P2_WORK[targetDow];
   if(!S.medsCheck[selDate]) S.medsCheck[selDate] = {p1:false, p2:false};
   
   if (viewMode === 'day') {
     el.innerHTML=`<div class="event-day-header">Daily Schedule</div>`;
     if(w1) el.innerHTML+= `<div class="med-item"><button class="med-check ${S.medsCheck[selDate].p1?'done':''}" onclick="toggleMed('${selDate}','p1')">✓</button><div class="med-text ${S.medsCheck[selDate].p1?'done':''}">${fmt12(w1.start)} - ${n1()}'s Meds</div></div>`;
     if(w2) el.innerHTML+= `<div class="med-item"><button class="med-check ${S.medsCheck[selDate].p2?'done':''}" onclick="toggleMed('${selDate}','p2')">✓</button><div class="med-text ${S.medsCheck[selDate].p2?'done':''}">${fmt12(w2.start)} - ${n2()}'s Meds</div></div>`;
-  } else {
-    const selLabel = selDate===todayISO ? 'Today' : new Date(selDate+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    el.innerHTML=`<div class="event-day-header">${selLabel}</div>`;
-  }
+  } else { el.innerHTML=`<div class="event-day-header">${selDate===todayISO ? 'Today' : new Date(selDate+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</div>`; }
   
   if(!selEvents.length && !w1 && !w2 && viewMode === 'day') el.innerHTML+=`<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No events scheduled</div>`;
   else if(!selEvents.length && viewMode !== 'day') el.innerHTML+=`<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No events scheduled</div>`;
@@ -817,31 +823,58 @@ function renderEventList(){
 }
 
 // ═══════════════════════════════════
-// TRIBUTES (SHOP)
+// THE EXCHANGE
 // ═══════════════════════════════════
-function addReward(){ const name=document.getElementById('rm-name').value.trim(); if(!name) return; S.rewards.push({ id: Date.now(), name, icon: document.getElementById('rm-icon').value||'🎁', type: document.getElementById('rm-type').value, cost: parseInt(document.getElementById('rm-cost').value)||50, claimed: false }); document.getElementById('rm-name').value=''; save(); closeModal('rewardModal'); renderRewards(); toast('Tribute added! 🗝️'); }
+function addReward(){ const name=document.getElementById('rm-name').value.trim(); if(!name) return; S.rewards.push({ id: Date.now(), name, icon: document.getElementById('rm-icon').value||'🎁', cost: parseInt(document.getElementById('rm-cost').value)||50 }); document.getElementById('rm-name').value=''; save(); closeModal('rewardModal'); renderRewards(); toast('Item added to Exchange 🗝️'); }
+
+function buyReward(id, buyer) {
+    const r = S.rewards.find(x => x.id === id);
+    if (buyer === 1) {
+        if (S.pts1 < r.cost) return toast('Not enough points! ❌');
+        S.pts1 -= r.cost;
+        S.habits.push({ id: Date.now(), name: 'Tribute: ' + r.name, cat: 'bonding', pts: 0, who: 'p2', assignedBy: 'p1', d1: 0, d2: 0, freq: 'none', subtasks: [], deletedAt: null });
+        toast(`Claimed! Demand sent to ${n2()} 🗝️`);
+    } else {
+        if (S.pts2 < r.cost) return toast('Not enough points! ❌');
+        S.pts2 -= r.cost;
+        S.habits.push({ id: Date.now(), name: 'Tribute: ' + r.name, cat: 'bonding', pts: 0, who: 'p1', assignedBy: 'p2', d1: 0, d2: 0, freq: 'none', subtasks: [], deletedAt: null });
+        toast(`Claimed! Demand sent to ${n1()} 🗝️`);
+    }
+    save(); renderAll();
+}
+
+function offerTribute(id, offerer) {
+    const r = S.rewards.find(x => x.id === id);
+    if (offerer === 1) {
+        S.habits.push({ id: Date.now(), name: 'Offer: ' + r.name, cat: 'bonding', pts: r.cost, who: 'p1', assignedBy: 'p1', d1: 0, d2: 0, freq: 'none', subtasks: [], deletedAt: null });
+        toast(`Tribute offered! Awaiting approval. 🗝️`);
+    } else {
+        S.habits.push({ id: Date.now(), name: 'Offer: ' + r.name, cat: 'bonding', pts: r.cost, who: 'p2', assignedBy: 'p2', d1: 0, d2: 0, freq: 'none', subtasks: [], deletedAt: null });
+        toast(`Tribute offered! Awaiting approval. 🗝️`);
+    }
+    save(); renderAll();
+}
 
 function renderRewards(){
   const grid = document.getElementById('rewardsGrid'); grid.innerHTML='';
   S.rewards.forEach(r=>{
-    const card=document.createElement('div'); card.className='reward-card'+(r.claimed?' claimed':'');
-    card.innerHTML=`<button class="rdel" data-rid="${r.id}">✕</button><div class="ricon">${r.icon}</div><div class="rtype type-${r.type}">${r.type}</div><div class="rname">${r.name}</div><div class="rcost">⭐ ${r.cost} pts</div>`;
-    
-    card.addEventListener('click', (e) => { 
-      if(e.target.classList.contains('rdel') || r.claimed)return; 
-      
-      // Auto-generate quest for punishment
-      if (r.type === 'punishment') {
-        S.habits.push({ id: Date.now(), name: 'Protocol: ' + r.name, cat: 'personal', pts: 0, who: 'p1', d1: 0, d2: 0, freq: 'none', subtasks: [], deletedAt: null });
-        toast(`Protocol assigned to ${n1()}! 🗝️`);
-      } else {
-        toast(`Claimed: ${r.name}`); 
-      }
-      
-      r.claimed=true; save(); renderAll(); 
-    });
-    
-    card.querySelector('.rdel').addEventListener('click', (e) => { e.stopPropagation(); S.rewards = S.rewards.filter(x=>x.id!==r.id); save(); renderRewards(); });
+    const card=document.createElement('div'); card.className='reward-card';
+    card.innerHTML=`
+      <button class="rdel" onclick="S.rewards = S.rewards.filter(x=>x.id!==${r.id}); save(); renderRewards();">✕</button>
+      <div class="ricon">${r.icon}</div>
+      <div class="rbody">
+        <div class="rname">${r.name}</div>
+        <div class="rcost">Value: ${r.cost} pts</div>
+        <div class="raction-row">
+            <button class="ex-btn btn-claim" onclick="buyReward(${r.id}, 1)" title="Rebecca spends points to demand this">R: Claim</button>
+            <button class="ex-btn btn-offer" onclick="offerTribute(${r.id}, 1)" title="Rebecca performs this to earn points">R: Offer</button>
+        </div>
+        <div class="raction-row" style="margin-top:6px;">
+            <button class="ex-btn btn-claim" onclick="buyReward(${r.id}, 2)" title="Marius spends points to demand this">M: Claim</button>
+            <button class="ex-btn btn-offer" onclick="offerTribute(${r.id}, 2)" title="Marius performs this to earn points">M: Offer</button>
+        </div>
+      </div>
+    `;
     grid.appendChild(card);
   });
 }
@@ -849,9 +882,7 @@ function renderRewards(){
 // ═══════════════════════════════════
 // WHITEBOARD
 // ═══════════════════════════════════
-const canvas = document.getElementById('whiteboard');
-const ctx = canvas.getContext('2d');
-let isDrawing = false; let boardColor = '#0d0c0f';
+const canvas = document.getElementById('whiteboard'); const ctx = canvas.getContext('2d'); let isDrawing = false; let boardColor = '#0d0c0f';
 function initBoard() { if (S.boardImage) { const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0); img.src = S.boardImage; } }
 function startDraw(e) { isDrawing = true; draw(e); }
 function draw(e) { if (!isDrawing) return; e.preventDefault(); const rect = canvas.getBoundingClientRect(); const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; const x = (clientX - rect.left) * (canvas.width / rect.width); const y = (clientY - rect.top) * (canvas.height / rect.height); ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.strokeStyle = boardColor; ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y); }
@@ -866,11 +897,17 @@ function saveBoardText() { S.boardText = document.getElementById('boardText').va
 // UPDATE ALL
 // ═══════════════════════════════════
 function updateStats(){
+  // Update Debt Colors
+  const p1El = document.getElementById('pts1'); const p2El = document.getElementById('pts2');
+  S.pts1 < 0 ? p1El.classList.add('debt') : p1El.classList.remove('debt');
+  S.pts2 < 0 ? p2El.classList.add('debt') : p2El.classList.remove('debt');
+
   const hp1 = S.habits.filter(h=>h.who!=='p2' && !h.deletedAt); const hp2 = S.habits.filter(h=>h.who!=='p1' && !h.deletedAt);
   const pct1 = hp1.length ? Math.round(hp1.filter(h=>h.d1===2).length/hp1.length*100) : 0; const pct2 = hp2.length ? Math.round(hp2.filter(h=>h.d2===2).length/hp2.length*100) : 0;
   const circ = 2*Math.PI*25; document.getElementById('ring1').style.strokeDashoffset = circ*(1-pct1/100); document.getElementById('ring2').style.strokeDashoffset = circ*(1-pct2/100);
   document.getElementById('pct1').textContent = pct1+'%'; document.getElementById('pct2').textContent = pct2+'%'; document.getElementById('pts1').textContent = S.pts1; document.getElementById('pts2').textContent = S.pts2;
-  const t = S.pts1+S.pts2||1; document.getElementById('barp1').style.width = Math.round(S.pts1/t*100)+'%';
+  const t = Math.abs(S.pts1)+Math.abs(S.pts2)||1; 
+  document.getElementById('barp1').style.width = Math.round(Math.abs(S.pts1)/t*100)+'%';
 }
 function renderAll(){ updateStats(); renderWorkStrip(); renderQuests(); renderRewards(); renderEventList(); }
 document.getElementById('name1').addEventListener('change',save); document.getElementById('name2').addEventListener('change',save);
