@@ -140,7 +140,7 @@ section.active { display:block; }
 
 /* ── WHITEBOARD ── */
 .board-container { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:#fff; touch-action:none; position:relative; }
-.board-tools { display:flex; gap:8px; margin-top:10px; align-items:center; }
+.board-tools { display:flex; gap:8px; margin-top:10px; align-items:center; flex-wrap:wrap; }
 .pen-color { width:24px; height:24px; border-radius:50%; border:2px solid transparent; cursor:pointer; }
 .pen-color.sel { border-color:var(--text); transform:scale(1.1); }
 #boardText { width:100%; min-height:100px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-b); font-size:0.85rem; padding:12px; resize:vertical; margin-top:14px; outline:none; }
@@ -193,7 +193,7 @@ section.active { display:block; }
 <div class="app">
 
 <header>
-  <div style="position:absolute; top:12px; right:14px; font-size:0.6rem; color:var(--muted2); font-family:monospace; font-weight:600;">v16</div>
+  <div style="position:absolute; top:12px; right:14px; font-size:0.6rem; color:var(--muted2); font-family:monospace; font-weight:600;">v17</div>
   <div class="logo">us <span>🤎</span></div>
   <div class="hdate" id="hdate"></div>
   <div class="streak">🔥 <span id="streakN">0</span> day streak</div>
@@ -220,9 +220,8 @@ section.active { display:block; }
     <div class="shared-bar"><div class="sbar-p1" id="barp1"></div><div class="sbar-p2" id="barp2"></div></div>
   </div>
   
-  <div class="sec-head"><div class="sec-title">Work Week & Meds</div></div>
+  <div class="sec-head"><div class="sec-title">Work Week</div></div>
   <div class="work-strip" id="workStrip"></div>
-  <div id="medReminders" style="margin-bottom:18px;"></div>
   
   <div class="sec-head" style="margin-top:20px;"><div class="sec-title">Today's Schedule</div></div>
   <div id="dashEvents"></div>
@@ -292,10 +291,14 @@ section.active { display:block; }
   <div class="sec-head"><div class="sec-title">Daily Board</div><div style="font-size:0.6rem; color:var(--muted);">Resets at Midnight</div></div>
   <div class="board-container"><canvas id="whiteboard" width="450" height="350"></canvas></div>
   <div class="board-tools">
-    <div class="pen-color sel" style="background:#0d0c0f" data-c="#0d0c0f"></div>
-    <div class="pen-color" style="background:#e8a4b8" data-c="#e8a4b8"></div>
-    <div class="pen-color" style="background:#90c4e0" data-c="#90c4e0"></div>
-    <div class="pen-color" style="background:#7ecaa0" data-c="#7ecaa0"></div>
+    <div class="pen-color sel" style="background:#0d0c0f" data-c="#0d0c0f" title="Black"></div>
+    <div class="pen-color" style="background:#ffffff; border-color:var(--border2);" data-c="#ffffff" title="White / Eraser"></div>
+    <div class="pen-color" style="background:#e8a4b8" data-c="#e8a4b8" title="Pink"></div>
+    <div class="pen-color" style="background:#90c4e0" data-c="#90c4e0" title="Blue"></div>
+    <div class="pen-color" style="background:#7ecaa0" data-c="#7ecaa0" title="Green"></div>
+    <div class="pen-color" style="background:#b09cda" data-c="#b09cda" title="Purple"></div>
+    <div class="pen-color" style="background:#d4a96a" data-c="#d4a96a" title="Gold"></div>
+    <div class="pen-color" style="background:#e07878" data-c="#e07878" title="Red"></div>
     <div style="flex:1"></div>
     <button class="btn btn-ghost" style="padding:6px; font-size:0.7rem" onclick="clearBoard()">Clear</button>
   </div>
@@ -436,7 +439,7 @@ const P2_WORK = { 1:{start:'10:30',end:'19:00'}, 2:{start:'10:30',end:'19:00'}, 
 const DAYS3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 let S = deepClone(DEFAULT);
-const saved = localStorage.getItem('ct16'); 
+const saved = localStorage.getItem('ct17'); 
 if(saved){ try{ S = {...S, ...JSON.parse(saved)}; }catch(e){} }
 
 // Strict Fallbacks
@@ -478,7 +481,7 @@ document.getElementById('hdate').textContent = now.toLocaleDateString('en-US',{w
 document.getElementById('boardText').value = S.boardText || '';
 
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
-function save(){ localStorage.setItem('ct16', JSON.stringify(S)); }
+function save(){ localStorage.setItem('ct17', JSON.stringify(S)); }
 function n1(){ return document.getElementById('name1').value||'Rebecca'; }
 function n2(){ return document.getElementById('name2').value||'Marius'; }
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2400); }
@@ -513,13 +516,6 @@ function renderWorkStrip(){
     d.innerHTML = `<div class="wday-name">${DAYS3[targetDow]}</div>${html1}${html2}`;
     el.appendChild(d);
   }
-  
-  const w1Today = P1_WORK[todayDow]; const w2Today = P2_WORK[todayDow];
-  let medsHtml = '';
-  if(w1Today) medsHtml += `<div class="med-alert"><span>💊</span> <div>Take meds at <b>${fmt12(w1Today.start)}</b> (${n1()})</div></div>`;
-  if(w2Today) medsHtml += `<div class="med-alert"><span>💊</span> <div>Take meds at <b>${fmt12(w2Today.start)}</b> (${n2()})</div></div>`;
-  if(!w1Today && !w2Today) medsHtml = `<div class="med-alert" style="opacity:0.5;">No work shifts today</div>`;
-  document.getElementById('medReminders').innerHTML = medsHtml;
 }
 
 // ═══════════════════════════════════
@@ -797,7 +793,7 @@ function toggleMed(dateStr, player) { if(!S.medsCheck[dateStr]) S.medsCheck[date
 function makeEventEl(ev, compact){
   const whoLabel = ev.who==='both'?`${n1()} & ${n2()}`:ev.who==='p1'?n1():n2();
   const d = document.createElement('div'); d.className='event-item'; d.style.borderLeftColor=ev.color;
-  d.innerHTML=`<div class="ev-time">${fmtTime(ev.time)}</div><div class="ev-body"><div class="ev-title">${ev.isIntimacy?'🤍 ':''}${ev.title}</div><div class="ev-who">${whoLabel} ${ev.end?' until '+fmtTime(ev.end):''}</div></div>${!compact?`<button class="edit-btn" onclick="openEventModal(${ev.id})">✎</button><button class="del-btn" onclick="S.events=S.events.filter(x=>x.id!==${ev.id}); save(); renderCalendar(); renderEventList();">✕</button>`:''}`;
+  d.innerHTML=`<div class="ev-time">${fmt12(ev.time)}</div><div class="ev-body"><div class="ev-title">${ev.isIntimacy?'🤍 ':''}${ev.title}</div><div class="ev-who">${whoLabel} ${ev.end?' until '+fmt12(ev.end):''}</div></div>${!compact?`<button class="edit-btn" onclick="openEventModal(${ev.id})">✎</button><button class="del-btn" onclick="S.events=S.events.filter(x=>x.id!==${ev.id}); save(); renderCalendar(); renderEventList();">✕</button>`:''}`;
   return d;
 }
 
@@ -900,7 +896,7 @@ function clearBoard() { ctx.clearRect(0, 0, canvas.width, canvas.height); S.boar
 function saveBoardText() { S.boardText = document.getElementById('boardText').value; save(); }
 
 // ═══════════════════════════════════
-// UPDATE ALL
+// UPDATE ALL (ARMORED)
 // ═══════════════════════════════════
 function updateStats(){
   try {
