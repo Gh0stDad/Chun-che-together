@@ -67,8 +67,10 @@ section.active { display:block; }
 .p2 .ppts { color:var(--p2); }
 .ppts.debt { color:var(--danger) !important; text-shadow: 0 0 8px rgba(224,120,120,0.5); }
 .ppts-lbl { font-size:0.6rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:2px; }
+
+/* Restored Combined Power Bar */
 .shared-card { background:var(--card); border-radius:var(--radius); padding:14px; border:1px solid var(--border); margin-bottom:14px; }
-.shared-lbl { display:flex; justify-content:space-between; font-size:0.7rem; color:var(--muted); margin-bottom:8px; }
+.shared-lbl { display:flex; justify-content:space-between; font-size:0.7rem; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
 .shared-bar { height:7px; background:var(--border); border-radius:4px; overflow:hidden; position:relative; }
 .sbar-p1 { position:absolute; left:0; top:0; height:100%; background:var(--p1); border-radius:4px; transition:width 0.6s ease; }
 .sbar-p2 { position:absolute; right:0; top:0; height:100%; background:var(--p2); border-radius:4px; transition:width 0.6s ease; }
@@ -212,6 +214,11 @@ section.active { display:block; }
       <div class="ring-wrap"><svg width="60" height="60" viewBox="0 0 60 60"><circle class="ring-bg" cx="30" cy="30" r="25"/><circle class="ring-fill" id="ring2" cx="30" cy="30" r="25" stroke-dasharray="157.08" stroke-dashoffset="157.08"/></svg><div class="ring-pct" id="pct2">0%</div></div>
       <div class="ppts" id="pts2">0</div><div class="ppts-lbl">points</div>
     </div>
+  </div>
+
+  <div class="shared-card">
+    <div class="shared-lbl"><span>Combined Power</span></div>
+    <div class="shared-bar"><div class="sbar-p1" id="barp1"></div><div class="sbar-p2" id="barp2"></div></div>
   </div>
   
   <div class="sec-head"><div class="sec-title">Work Week & Meds</div></div>
@@ -430,16 +437,12 @@ const P2_WORK = { 1:{start:'10:30',end:'19:00'}, 2:{start:'10:30',end:'19:00'}, 
 const DAYS3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 let S = deepClone(DEFAULT);
-const saved = localStorage.getItem('ct13'); // Forced fresh DB mapping
+const saved = localStorage.getItem('ct14'); 
 if(saved){ try{ S = {...S, ...JSON.parse(saved)}; }catch(e){} }
 
-// Strict Fallbacks to prevent rendering crashes
-if(!S.habits) S.habits = [];
-if(!S.events) S.events = [];
-if(!S.rewards) S.rewards = [];
-if(!S.cycle) S.cycle = deepClone(DEFAULT.cycle);
-if(!S.cycle.dailyLogs) S.cycle.dailyLogs = {};
-if(!S.medsCheck) S.medsCheck = {};
+// Strict Fallbacks
+if(!S.habits) S.habits = []; if(!S.events) S.events = []; if(!S.rewards) S.rewards = [];
+if(!S.cycle) S.cycle = deepClone(DEFAULT.cycle); if(!S.cycle.dailyLogs) S.cycle.dailyLogs = {}; if(!S.medsCheck) S.medsCheck = {};
 
 const now = new Date();
 const todayISO = now.toISOString().slice(0,10);
@@ -457,7 +460,6 @@ if(S.lastReset !== todayISO){
     if (h.freq === 'interval' && h.lastDoneDate) {
       if ((now - new Date(h.lastDoneDate)) > 3 * 86400000) shouldReset = true;
     }
-    
     if(shouldReset) { 
       let p1Fail = (h.who === 'p1' || h.who === 'both') && h.d1 !== 2;
       let p2Fail = (h.who === 'p2' || h.who === 'both') && h.d2 !== 2;
@@ -477,7 +479,7 @@ document.getElementById('hdate').textContent = now.toLocaleDateString('en-US',{w
 document.getElementById('boardText').value = S.boardText || '';
 
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
-function save(){ localStorage.setItem('ct13', JSON.stringify(S)); }
+function save(){ localStorage.setItem('ct14', JSON.stringify(S)); }
 function n1(){ return document.getElementById('name1').value||'Rebecca'; }
 function n2(){ return document.getElementById('name2').value||'Marius'; }
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2400); }
@@ -494,7 +496,6 @@ function showSec(name, btn){
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); tempSubtasks = []; document.getElementById('subPreview').innerHTML = ''; }
 document.querySelectorAll('.overlay').forEach(o=>{ o.addEventListener('click', e=>{ if(e.target===o) closeModal(o.id); }); });
-
 document.querySelectorAll('.pill').forEach(p => { p.addEventListener('click', () => { if(p.parentElement.id === 'logFlow') { document.querySelectorAll('#logFlow .pill').forEach(el => { if(el!==p) el.classList.remove('active') }); } p.classList.toggle('active'); }); });
 
 // ═══════════════════════════════════
@@ -581,7 +582,7 @@ function getCyclePhase(targetDateStr) {
 }
 
 // ═══════════════════════════════════
-// QUESTS (V13 Armored)
+// QUESTS (V14 ARMORED FIX)
 // ═══════════════════════════════════
 function renderSubPreview() { document.getElementById('subPreview').innerHTML = tempSubtasks.map((s,i) => `<div class="step-preview-item"><span>${s.text}</span><button onclick="tempSubtasks.splice(${i},1); renderSubPreview();" style="background:none;border:none;color:var(--danger);cursor:pointer;">✕</button></div>`).join(''); }
 function addSubtask(){ const inp = document.getElementById('hm-sub-input'); if(!inp.value.trim()) return; tempSubtasks.push({ id: Date.now(), text: inp.value.trim(), done: false }); inp.value = ''; renderSubPreview(); }
@@ -612,7 +613,7 @@ function addHabit(){
     
     document.getElementById('hm-date').value=''; document.getElementById('hm-time').value=''; save(); closeModal('habitModal'); renderAll(); 
   } catch(e) {
-    alert("Save Error: Please screenshot this! " + e.message);
+    alert("Save Error: " + e.message);
   }
 }
 
@@ -623,12 +624,9 @@ function makeQuestEl(h){
   const subsTotal = h.subtasks ? h.subtasks.length : 0; const subsDone = h.subtasks ? h.subtasks.filter(s => s.done).length : 0;
   
   let directiveClass = ''; let directiveIcon = '';
-  if (h.assignedBy !== h.who && h.assignedBy !== 'both' && h.who !== 'both') {
-    directiveClass = 'directive'; directiveIcon = '🗝️ ';
-  }
+  if (h.assignedBy !== h.who && h.assignedBy !== 'both' && h.who !== 'both') { directiveClass = 'directive'; directiveIcon = '🗝️ '; }
 
-  let actionsHtml = '';
-  let hc1 = h.c1 || 0; let hc2 = h.c2 || 0; let hmax = h.maxCount || 1;
+  let actionsHtml = ''; let hc1 = h.c1 || 0; let hc2 = h.c2 || 0; let hmax = h.maxCount || 1;
 
   if (showP1) {
     if (hmax > 1) {
@@ -654,8 +652,7 @@ function makeQuestEl(h){
     }
   }
 
-  let deadlineHtml = '';
-  if (h.time && h.freq !== 'none') deadlineHtml = `<span class="q-deadline">by ${fmt12(h.time)}</span>`;
+  let deadlineHtml = ''; if (h.time && h.freq !== 'none') deadlineHtml = `<span class="q-deadline">by ${fmt12(h.time)}</span>`;
 
   return `
     <div class="q-item ${isCoop?'coop':''} ${directiveClass}">
@@ -681,7 +678,6 @@ function makeQuestEl(h){
 function progressQuest(id, player) {
   const h = S.habits.find(x => x.id === id); const nowMs = Date.now();
   if(!h.c1) h.c1 = 0; if(!h.c2) h.c2 = 0;
-  
   if(player === 1) {
     if (h.d1 !== 0) { h.d1 = 0; h.c1 = 0; save(); renderAll(); return; } 
     if (h.cdMins && h.lastT1 && (nowMs - h.lastT1) < (h.cdMins * 60000)) { const rem = Math.ceil((h.cdMins * 60000 - (nowMs - h.lastT1))/60000); return toast(`Cooldown! Wait ${rem} mins.`); }
@@ -899,19 +895,36 @@ function clearBoard() { ctx.clearRect(0, 0, canvas.width, canvas.height); S.boar
 function saveBoardText() { S.boardText = document.getElementById('boardText').value; save(); }
 
 // ═══════════════════════════════════
-// UPDATE ALL
+// UPDATE ALL (ARMORED)
 // ═══════════════════════════════════
 function updateStats(){
-  const p1El = document.getElementById('pts1'); const p2El = document.getElementById('pts2');
-  S.pts1 < 0 ? p1El.classList.add('debt') : p1El.classList.remove('debt');
-  S.pts2 < 0 ? p2El.classList.add('debt') : p2El.classList.remove('debt');
+  try {
+    const p1El = document.getElementById('pts1'); const p2El = document.getElementById('pts2');
+    if(p1El) S.pts1 < 0 ? p1El.classList.add('debt') : p1El.classList.remove('debt');
+    if(p2El) S.pts2 < 0 ? p2El.classList.add('debt') : p2El.classList.remove('debt');
 
-  const hp1 = S.habits.filter(h=>h.who!=='p2' && !h.deletedAt); const hp2 = S.habits.filter(h=>h.who!=='p1' && !h.deletedAt);
-  const pct1 = hp1.length ? Math.round(hp1.filter(h=>h.d1===2).length/hp1.length*100) : 0; const pct2 = hp2.length ? Math.round(hp2.filter(h=>h.d2===2).length/hp2.length*100) : 0;
-  const circ = 2*Math.PI*25; document.getElementById('ring1').style.strokeDashoffset = circ*(1-pct1/100); document.getElementById('ring2').style.strokeDashoffset = circ*(1-pct2/100);
-  document.getElementById('pct1').textContent = pct1+'%'; document.getElementById('pct2').textContent = pct2+'%'; document.getElementById('pts1').textContent = S.pts1; document.getElementById('pts2').textContent = S.pts2;
-  const t = Math.abs(S.pts1)+Math.abs(S.pts2)||1; 
-  document.getElementById('barp1').style.width = Math.round(Math.abs(S.pts1)/t*100)+'%';
+    const hp1 = S.habits.filter(h=>h.who!=='p2' && !h.deletedAt); const hp2 = S.habits.filter(h=>h.who!=='p1' && !h.deletedAt);
+    const pct1 = hp1.length ? Math.round(hp1.filter(h=>h.d1===2).length/hp1.length*100) : 0; const pct2 = hp2.length ? Math.round(hp2.filter(h=>h.d2===2).length/hp2.length*100) : 0;
+    
+    if(document.getElementById('ring1')) {
+      const circ = 2*Math.PI*25; 
+      document.getElementById('ring1').style.strokeDashoffset = circ*(1-pct1/100); 
+      if(document.getElementById('ring2')) document.getElementById('ring2').style.strokeDashoffset = circ*(1-pct2/100);
+      if(document.getElementById('pct1')) document.getElementById('pct1').textContent = pct1+'%'; 
+      if(document.getElementById('pct2')) document.getElementById('pct2').textContent = pct2+'%'; 
+    }
+    
+    if(p1El) p1El.textContent = S.pts1; 
+    if(p2El) p2El.textContent = S.pts2;
+    
+    const bar1 = document.getElementById('barp1');
+    if(bar1) {
+      const t = Math.abs(S.pts1)+Math.abs(S.pts2)||1; 
+      bar1.style.width = Math.round(Math.abs(S.pts1)/t*100)+'%';
+    }
+  } catch (e) {
+    console.error("Stat render error ignored: " + e.message);
+  }
 }
 function renderAll(){ updateStats(); renderWorkStrip(); renderQuests(); renderRewards(); renderEventList(); }
 document.getElementById('name1').addEventListener('change',save); document.getElementById('name2').addEventListener('change',save);
