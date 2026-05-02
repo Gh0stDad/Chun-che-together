@@ -46,6 +46,8 @@ section.active { display:block; }
 .shift-off { background:var(--card2); color:var(--muted); border-color:var(--border); font-style:italic; }
 .med-alert { display:flex; align-items:center; gap:8px; background:var(--card2); border:1px solid var(--border2); border-radius:8px; padding:8px 12px; font-size:0.75rem; color:var(--text); margin-bottom:4px; }
 .med-alert span { color:var(--success); font-size:1rem; }
+.app-alert { display:flex; align-items:center; gap:8px; background:rgba(224,184,120,0.1); border:1px solid var(--warning); border-radius:8px; padding:8px 12px; font-size:0.75rem; color:var(--text); margin-bottom:4px; }
+.app-alert span { font-size:1rem; }
 
 .players { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
 .pcard { background:var(--card); border-radius:var(--radius); padding:14px 12px; border:1px solid var(--border); text-align:center; position:relative; overflow:hidden; }
@@ -153,7 +155,8 @@ section.active { display:block; }
 .rname { font-size:0.9rem; font-weight:500; margin-bottom:2px; }
 .rcost { font-size:0.7rem; color:var(--gold); font-weight:600; margin-bottom:8px; }
 .raction-row { display:flex; gap:6px; }
-.ex-btn { flex:1; padding:6px 0; border-radius:6px; font-size:0.65rem; font-family:var(--font-b); font-weight:600; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; border:1px solid transparent; }
+.ex-btn { flex:1; padding:6px 0; border-radius:6px; font-size:0.65rem; font-family:var(--font-b); font-weight:600; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; border:1px solid transparent; transition: opacity 0.2s; }
+.ex-btn.disabled { opacity: 0.3; cursor: not-allowed; }
 .btn-claim { background:rgba(212,169,106,0.1); color:var(--gold); border-color:var(--gold); }
 .btn-offer { background:rgba(126,202,160,0.1); color:var(--success); border-color:var(--success); }
 .rdel { position:absolute; top:8px; right:10px; background:none; border:none; color:var(--muted); font-size:0.8rem; cursor:pointer; opacity:0.5; }
@@ -193,7 +196,7 @@ section.active { display:block; }
 <div class="app">
 
 <header>
-  <div style="position:absolute; top:12px; right:14px; font-size:0.6rem; color:var(--muted2); font-family:monospace; font-weight:600;">v17</div>
+  <div style="position:absolute; top:12px; right:14px; font-size:0.6rem; color:var(--muted2); font-family:monospace; font-weight:600;">v19</div>
   <div class="logo">us <span>🤎</span></div>
   <div class="hdate" id="hdate"></div>
   <div class="streak">🔥 <span id="streakN">0</span> day streak</div>
@@ -222,6 +225,8 @@ section.active { display:block; }
   
   <div class="sec-head"><div class="sec-title">Work Week</div></div>
   <div class="work-strip" id="workStrip"></div>
+  
+  <div id="dashNotifs" style="margin-bottom:18px;"></div>
   
   <div class="sec-head" style="margin-top:20px;"><div class="sec-title">Today's Schedule</div></div>
   <div id="dashEvents"></div>
@@ -293,6 +298,7 @@ section.active { display:block; }
   <div class="board-tools">
     <div class="pen-color sel" style="background:#0d0c0f" data-c="#0d0c0f" title="Black"></div>
     <div class="pen-color" style="background:#ffffff; border-color:var(--border2);" data-c="#ffffff" title="White / Eraser"></div>
+    <div class="pen-color" style="background:#b58b66" data-c="#b58b66" title="Light Brown"></div>
     <div class="pen-color" style="background:#e8a4b8" data-c="#e8a4b8" title="Pink"></div>
     <div class="pen-color" style="background:#90c4e0" data-c="#90c4e0" title="Blue"></div>
     <div class="pen-color" style="background:#7ecaa0" data-c="#7ecaa0" title="Green"></div>
@@ -439,7 +445,7 @@ const P2_WORK = { 1:{start:'10:30',end:'19:00'}, 2:{start:'10:30',end:'19:00'}, 
 const DAYS3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 let S = deepClone(DEFAULT);
-const saved = localStorage.getItem('ct17'); 
+const saved = localStorage.getItem('ct19'); 
 if(saved){ try{ S = {...S, ...JSON.parse(saved)}; }catch(e){} }
 
 // Strict Fallbacks
@@ -462,11 +468,14 @@ if(S.lastReset !== todayISO){
     if (h.freq === 'interval' && h.lastDoneDate) {
       if ((now - new Date(h.lastDoneDate)) > 3 * 86400000) shouldReset = true;
     }
+    
     if(shouldReset) { 
-      let p1Fail = (h.who === 'p1' || h.who === 'both') && h.d1 !== 2;
-      let p2Fail = (h.who === 'p2' || h.who === 'both') && h.d2 !== 2;
-      if(p1Fail) S.pts1 -= h.pts; 
-      if(p2Fail) S.pts2 -= h.pts; 
+      if (h.freq !== 'none') {
+        let p1Fail = (h.who === 'p1' || h.who === 'both') && h.d1 !== 2;
+        let p2Fail = (h.who === 'p2' || h.who === 'both') && h.d2 !== 2;
+        if(p1Fail) S.pts1 -= h.pts; 
+        if(p2Fail) S.pts2 -= h.pts; 
+      }
       h.d1 = 0; h.d2 = 0; h.c1 = 0; h.c2 = 0; h.lastT1 = 0; h.lastT2 = 0; 
       if(h.subtasks) h.subtasks.forEach(s => s.done = false); 
     }
@@ -481,7 +490,7 @@ document.getElementById('hdate').textContent = now.toLocaleDateString('en-US',{w
 document.getElementById('boardText').value = S.boardText || '';
 
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
-function save(){ localStorage.setItem('ct17', JSON.stringify(S)); }
+function save(){ localStorage.setItem('ct19', JSON.stringify(S)); }
 function n1(){ return document.getElementById('name1').value||'Rebecca'; }
 function n2(){ return document.getElementById('name2').value||'Marius'; }
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2400); }
@@ -491,7 +500,7 @@ function showSec(name, btn){
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active')); 
   document.getElementById('sec-'+name).classList.add('active'); 
   btn.classList.add('active'); 
-  if(name==='schedule') { if(viewMode==='day') viewMode='month'; renderCalendar(); renderEventList(); } 
+  if(name==='schedule') { renderCalendar(); renderEventList(); } 
   if(name==='board') initBoard();
 }
 
@@ -501,7 +510,7 @@ document.querySelectorAll('.overlay').forEach(o=>{ o.addEventListener('click', e
 document.querySelectorAll('.pill').forEach(p => { p.addEventListener('click', () => { if(p.parentElement.id === 'logFlow') { document.querySelectorAll('#logFlow .pill').forEach(el => { if(el!==p) el.classList.remove('active') }); } p.classList.toggle('active'); }); });
 
 // ═══════════════════════════════════
-// WORK STRIP & MEDS
+// WORK STRIP
 // ═══════════════════════════════════
 function fmt12(t){ if(!t) return ''; const [h,m] = t.split(':'); const hr = parseInt(h); return `${hr>12?hr-12:hr||12}:${m}${hr>=12?'pm':'am'}`; }
 function renderWorkStrip(){
@@ -577,7 +586,7 @@ function getCyclePhase(targetDateStr) {
 }
 
 // ═══════════════════════════════════
-// QUESTS
+// QUESTS (V19 SORTING)
 // ═══════════════════════════════════
 function renderSubPreview() { document.getElementById('subPreview').innerHTML = tempSubtasks.map((s,i) => `<div class="step-preview-item"><span>${s.text}</span><button onclick="tempSubtasks.splice(${i},1); renderSubPreview();" style="background:none;border:none;color:var(--danger);cursor:pointer;">✕</button></div>`).join(''); }
 function addSubtask(){ const inp = document.getElementById('hm-sub-input'); if(!inp.value.trim()) return; tempSubtasks.push({ id: Date.now(), text: inp.value.trim(), done: false }); inp.value = ''; renderSubPreview(); }
@@ -586,6 +595,7 @@ function openHabitModal(hid = null) {
   const el = document.getElementById('hm-id');
   if(hid) {
     const h = S.habits.find(x => x.id === hid);
+    if (!h) return;
     document.getElementById('hm-modal-title').textContent = "Edit Quest";
     el.value = h.id; document.getElementById('hm-name').value = h.name; document.getElementById('hm-pts').value = h.pts; document.getElementById('hm-who').value = h.who; document.getElementById('hm-assigner').value = h.assignedBy || 'both'; document.getElementById('hm-freq').value = h.freq || 'none'; document.getElementById('hm-date').value = h.date || ''; document.getElementById('hm-time').value = h.time || ''; document.getElementById('hm-count').value = h.maxCount || 1; document.getElementById('hm-cd').value = h.cdMins || 0;
     tempSubtasks = deepClone(h.subtasks || []);
@@ -613,6 +623,7 @@ function addHabit(){
 }
 
 function makeQuestEl(h){
+  if (!h) return '';
   if (h.deletedAt) return `<div class="deleted-quest">Deleted by ${h.who==='p1'?n1():n2()}</div>`;
 
   const isCoop = h.who === 'both'; const showP1 = h.who !== 'p2'; const showP2 = h.who !== 'p1';
@@ -671,7 +682,8 @@ function makeQuestEl(h){
 }
 
 function progressQuest(id, player) {
-  const h = S.habits.find(x => x.id === id); const nowMs = Date.now();
+  const h = S.habits.find(x => x.id === id); if(!h) return;
+  const nowMs = Date.now();
   if(!h.c1) h.c1 = 0; if(!h.c2) h.c2 = 0;
   if(player === 1) {
     if (h.d1 !== 0) { h.d1 = 0; h.c1 = 0; save(); renderAll(); return; } 
@@ -686,27 +698,51 @@ function progressQuest(id, player) {
 }
 
 function approveQuest(id, player) {
-  const h = S.habits.find(x => x.id === id);
+  const h = S.habits.find(x => x.id === id); if(!h) return;
   if(player === 1) { h.d1 = 2; S.pts1 += h.pts; toast(`Approved! +${h.pts} pts for ${n1()}`); }
   else { h.d2 = 2; S.pts2 += h.pts; toast(`Approved! +${h.pts} pts for ${n2()}`); }
   save(); renderAll();
 }
 
-function deleteQuest(id) { const h = S.habits.find(x => x.id === id); h.deletedAt = Date.now(); save(); renderAll(); }
-function toggleSub(hid, sid) { const h = S.habits.find(x => x.id === hid); const s = h.subtasks.find(x => x.id === sid); s.done = !s.done; save(); renderAll(); }
+function deleteQuest(id) { const h = S.habits.find(x => x.id === id); if(!h) return; h.deletedAt = Date.now(); save(); renderAll(); }
+function toggleSub(hid, sid) { const h = S.habits.find(x => x.id === hid); if(!h) return; const s = h.subtasks.find(x => x.id === sid); s.done = !s.done; save(); renderAll(); }
 
 function renderQuests(){
   document.getElementById('hdr-name1').textContent = n1(); document.getElementById('hdr-name2').textContent = n2();
   const cList = document.getElementById('q-coop-list'); const p1Today = document.getElementById('q-p1-today'); const p1Backlog = document.getElementById('q-p1-backlog'); const p2Today = document.getElementById('q-p2-today'); const p2Backlog = document.getElementById('q-p2-backlog');
   cList.innerHTML=''; p1Today.innerHTML=''; p1Backlog.innerHTML=''; p2Today.innerHTML=''; p2Backlog.innerHTML='';
 
+  let p1t=[], p1b=[], p2t=[], p2b=[], coop=[];
+  
   S.habits.forEach(h => {
-    const isToday = h.freq !== 'none' || (h.date && h.date === todayISO) || (h.deletedAt);
-    const html = makeQuestEl(h);
-    if(h.who === 'both') { cList.innerHTML += html; return; }
-    if(h.who === 'p1') { isToday ? p1Today.innerHTML += html : p1Backlog.innerHTML += html; }
-    if(h.who === 'p2') { isToday ? p2Today.innerHTML += html : p2Backlog.innerHTML += html; }
+    const isToday = h.freq !== 'none' || (h.date && h.date === todayISO) || h.deletedAt;
+    if(h.who === 'both') { coop.push(h); }
+    else if(h.who === 'p1') { isToday ? p1t.push(h) : p1b.push(h); }
+    else if(h.who === 'p2') { isToday ? p2t.push(h) : p2b.push(h); }
   });
+  
+  // V19 Sorting Math: Active (0) -> Awaiting (1) -> Done (2) -> Deleted
+  const sortFn = (p) => (a, b) => {
+    if (a.deletedAt && !b.deletedAt) return 1;
+    if (!a.deletedAt && b.deletedAt) return -1;
+    const statA = p===1 ? a.d1 : a.d2;
+    const statB = p===1 ? b.d1 : b.d2;
+    return statA - statB;
+  };
+  const coopSort = (a, b) => {
+    if (a.deletedAt && !b.deletedAt) return 1;
+    if (!a.deletedAt && b.deletedAt) return -1;
+    const statA = Math.min(a.d1, a.d2);
+    const statB = Math.min(b.d1, b.d2);
+    return statA - statB;
+  };
+
+  coop.sort(coopSort).forEach(h => cList.innerHTML += makeQuestEl(h));
+  p1t.sort(sortFn(1)).forEach(h => p1Today.innerHTML += makeQuestEl(h));
+  p1b.sort(sortFn(1)).forEach(h => p1Backlog.innerHTML += makeQuestEl(h));
+  p2t.sort(sortFn(2)).forEach(h => p2Today.innerHTML += makeQuestEl(h));
+  p2b.sort(sortFn(2)).forEach(h => p2Backlog.innerHTML += makeQuestEl(h));
+
   if(cList.innerHTML==='') cList.innerHTML='<div style="color:var(--muted);font-size:0.7rem;text-align:center;">No co-op quests.</div>';
   if(p1Today.innerHTML==='') p1Today.innerHTML='<div style="color:var(--muted);font-size:0.7rem;">Clear.</div>';
   if(p2Today.innerHTML==='') p2Today.innerHTML='<div style="color:var(--muted);font-size:0.7rem;">Clear.</div>';
@@ -860,6 +896,9 @@ function offerTribute(id, offerer) {
 function renderRewards(){
   const grid = document.getElementById('rewardsGrid'); grid.innerHTML='';
   S.rewards.forEach(r=>{
+    const p1CanAfford = S.pts1 >= r.cost;
+    const p2CanAfford = S.pts2 >= r.cost;
+    
     const card=document.createElement('div'); card.className='reward-card';
     card.innerHTML=`
       <button class="rdel" onclick="S.rewards = S.rewards.filter(x=>x.id!==${r.id}); save(); renderRewards();">✕</button>
@@ -868,11 +907,11 @@ function renderRewards(){
         <div class="rname">${r.name}</div>
         <div class="rcost">Value: ${r.cost} pts</div>
         <div class="raction-row">
-            <button class="ex-btn btn-claim" onclick="buyReward(${r.id}, 1)" title="Rebecca spends points to demand this">R: Claim</button>
+            <button class="ex-btn btn-claim ${p1CanAfford?'':'disabled'}" onclick="${p1CanAfford ? `buyReward(${r.id}, 1)` : ''}" title="Rebecca spends points to demand this">R: Claim</button>
             <button class="ex-btn btn-offer" onclick="offerTribute(${r.id}, 1)" title="Rebecca performs this to earn points">R: Offer</button>
         </div>
         <div class="raction-row" style="margin-top:6px;">
-            <button class="ex-btn btn-claim" onclick="buyReward(${r.id}, 2)" title="Marius spends points to demand this">M: Claim</button>
+            <button class="ex-btn btn-claim ${p2CanAfford?'':'disabled'}" onclick="${p2CanAfford ? `buyReward(${r.id}, 2)` : ''}" title="Marius spends points to demand this">M: Claim</button>
             <button class="ex-btn btn-offer" onclick="offerTribute(${r.id}, 2)" title="Marius performs this to earn points">M: Offer</button>
         </div>
       </div>
@@ -884,11 +923,23 @@ function renderRewards(){
 // ═══════════════════════════════════
 // WHITEBOARD
 // ═══════════════════════════════════
-const canvas = document.getElementById('whiteboard'); const ctx = canvas.getContext('2d'); let isDrawing = false; let boardColor = '#0d0c0f';
+const canvas = document.getElementById('whiteboard'); const ctx = canvas.getContext('2d'); 
+let isDrawing = false; let boardColor = '#0d0c0f'; let boardSaveTimeout;
+
 function initBoard() { if (S.boardImage) { const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0); img.src = S.boardImage; } }
 function startDraw(e) { isDrawing = true; draw(e); }
-function draw(e) { if (!isDrawing) return; e.preventDefault(); const rect = canvas.getBoundingClientRect(); const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; const x = (clientX - rect.left) * (canvas.width / rect.width); const y = (clientY - rect.top) * (canvas.height / rect.height); ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.strokeStyle = boardColor; ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y); }
-function endDraw() { isDrawing = false; ctx.beginPath(); S.boardImage = canvas.toDataURL(); save(); }
+function draw(e) { 
+  if (!isDrawing) return; e.preventDefault(); 
+  const rect = canvas.getBoundingClientRect(); const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; 
+  const x = (clientX - rect.left) * (canvas.width / rect.width); const y = (clientY - rect.top) * (canvas.height / rect.height); 
+  ctx.lineWidth = boardColor === '#ffffff' ? 12 : 3; 
+  ctx.lineCap = 'round'; ctx.strokeStyle = boardColor; ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y); 
+}
+function endDraw() { 
+  isDrawing = false; ctx.beginPath(); 
+  clearTimeout(boardSaveTimeout);
+  boardSaveTimeout = setTimeout(() => { S.boardImage = canvas.toDataURL(); save(); }, 1500);
+}
 canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', endDraw);
 canvas.addEventListener('touchstart', startDraw, {passive:false}); canvas.addEventListener('touchmove', draw, {passive:false}); canvas.addEventListener('touchend', endDraw);
 document.querySelectorAll('.pen-color').forEach(el => { el.addEventListener('click', () => { document.querySelectorAll('.pen-color').forEach(e => e.classList.remove('sel')); el.classList.add('sel'); boardColor = el.dataset.c; }); });
@@ -896,7 +947,7 @@ function clearBoard() { ctx.clearRect(0, 0, canvas.width, canvas.height); S.boar
 function saveBoardText() { S.boardText = document.getElementById('boardText').value; save(); }
 
 // ═══════════════════════════════════
-// UPDATE ALL (ARMORED)
+// UPDATE ALL
 // ═══════════════════════════════════
 function updateStats(){
   try {
@@ -923,6 +974,19 @@ function updateStats(){
       const t = Math.abs(S.pts1)+Math.abs(S.pts2)||1; 
       bar1.style.width = Math.round(Math.abs(S.pts1)/t*100)+'%';
     }
+    
+    const dashNotifs = document.getElementById('dashNotifs');
+    if(dashNotifs) {
+      dashNotifs.innerHTML = '';
+      const p1Awaiting = S.habits.filter(h => (h.who==='p1' || h.who==='both') && h.d1 === 1 && !h.deletedAt).length;
+      const p2Awaiting = S.habits.filter(h => (h.who==='p2' || h.who==='both') && h.d2 === 1 && !h.deletedAt).length;
+      
+      let notifHtml = '';
+      if(p1Awaiting > 0) notifHtml += `<div class="app-alert"><span>⏳</span> <div>${n1()} has ${p1Awaiting} quest(s) awaiting approval!</div></div>`;
+      if(p2Awaiting > 0) notifHtml += `<div class="app-alert"><span>⏳</span> <div>${n2()} has ${p2Awaiting} quest(s) awaiting approval!</div></div>`;
+      dashNotifs.innerHTML = notifHtml;
+    }
+    
   } catch (e) {
     console.error("Stat render error ignored: " + e.message);
   }
